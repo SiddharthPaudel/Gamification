@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-
+import toast from 'react-hot-toast';
 const AddModule = () => {
   const [moduleData, setModuleData] = useState({
     title: '',
@@ -7,6 +7,8 @@ const AddModule = () => {
     category: 'Programming',
     difficulty: 'Beginner'
   });
+
+  const [loading, setLoading] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -16,20 +18,40 @@ const AddModule = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log('Module data:', moduleData);
-    // Here you would typically send the data to your backend
-    alert('Module created successfully!');
-    setModuleData({
-      title: '',
-      description: '',
-      category: 'Programming',
-      difficulty: 'Beginner'
-    });
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('http://localhost:5000/api/modules', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        body: JSON.stringify(moduleData),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to create module');
+      }
+
+      toast.success('Module created successfully!');
+      setModuleData({
+        title: '',
+        description: '',
+        category: 'Programming',
+        difficulty: 'Beginner',
+      });
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border">
+    <div className="bg-white p-6 rounded-lg shadow-sm border max-w-2xl mx-auto mt-10">
       <h2 className="text-xl font-semibold mb-6">Add New Module</h2>
       <div className="space-y-4">
         <div>
@@ -83,9 +105,10 @@ const AddModule = () => {
         </div>
         <button 
           onClick={handleSubmit}
-          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+          disabled={loading}
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-60"
         >
-          Create Module
+          {loading ? 'Creating...' : 'Create Module'}
         </button>
       </div>
     </div>

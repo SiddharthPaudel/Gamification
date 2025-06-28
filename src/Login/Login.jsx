@@ -10,29 +10,36 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
+  try {
+    const res = await fetch('http://localhost:5000/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      if (!res.ok) {
-        throw new Error(data.msg || 'Login failed');
-      }
-
-      login(data.token, data.user);
-      toast.success('Logged in successfully!');
-      navigate('/');
-    } catch (err) {
-      toast.error(err.message);
+    if (!res.ok) {
+      throw new Error(data.msg || 'Login failed');
     }
-  };
+
+    login(data.token, data.user);
+    toast.success('Logged in successfully!');
+
+    // Redirect based on role
+    if (data.user.role === 'admin') {
+      navigate('/admin');
+    } else {
+      navigate('/');
+    }
+  } catch (err) {
+    toast.error(err.message);
+  }
+};
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
