@@ -8,7 +8,7 @@ const AddLesson = () => {
     title: '',
     order: '',
     moduleId: '',
-    sections: [{ title: '', content: '' }]
+    sections: [{ heading: '', content: '' }]
   });
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const AddLesson = () => {
         title: '',
         order: '',
         moduleId: modules[0]?._id || '',
-        sections: [{ title: '', content: '' }]
+        sections: [{ heading: '', content: '' }]
       });
     } catch (error) {
       console.error('Error creating lesson:', error);
@@ -118,8 +118,8 @@ const AddLesson = () => {
           {lessonData.sections.map((section, idx) => (
             <div key={idx} className="p-4 border rounded space-y-2">
               <input
-                name="title"
-                value={section.title}
+                name="heading"
+                value={section.heading}
                 onChange={(e) => handleSectionChange(idx, e)}
                 className="w-full p-2 border rounded"
                 placeholder={`Section ${idx + 1} Title`}

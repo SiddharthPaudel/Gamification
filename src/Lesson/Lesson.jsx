@@ -1,96 +1,77 @@
-import React, { useState, useEffect } from 'react';
-import { ChevronRight, ChevronLeft, BookOpen, Clock, Award, Play, Pause, RotateCcw, CheckCircle, ArrowRight, Lightbulb } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useParams } from 'react-router-dom';
+import {
+  ChevronRight, ChevronLeft, BookOpen, Clock, Award, Play, Pause, RotateCcw, CheckCircle, ArrowRight, Lightbulb
+} from 'lucide-react';
 
 const Lesson = () => {
+   const { moduleId } = useParams();
+  const [lessons, setLessons] = useState([]);
+  const [currentLessonIndex, setCurrentLessonIndex] = useState(0);
   const [currentSection, setCurrentSection] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [completedSections, setCompletedSections] = useState(new Set());
-
-
-  const lessonData = {
-    title: "Introduction to React Hooks",
-    module: "React Fundamentals",
-    duration: "15 min",
-    difficulty: "Intermediate",
-    sections: [
-      {
-        id: 0,
-        title: "What are React Hooks?",
-        type: "concept",
-        content: "React Hooks are functions that let you 'hook into' React state and lifecycle features from function components. They were introduced in React 16.8 as a way to use state and other React features without writing a class component.",
-        keyPoints: [
-          "Hooks always start with 'use' (useState, useEffect, etc.)",
-          "They can only be called at the top level of React functions",
-          "They enable state management in functional components"
-        ]
-      },
-      {
-        id: 1,
-        title: "useState Hook",
-        type: "practical",
-        content: "The useState Hook lets you add state to functional components. It returns an array with the current state value and a function to update it.",
-        codeExample: `const [count, setCount] = useState(0);
-
-// Update state
-setCount(count + 1);
-
-// Or use functional update
-setCount(prev => prev + 1);`,
-        keyPoints: [
-          "Returns array: [state, setState]",
-          "Initial state can be a value or function",
-          "State updates trigger re-renders"
-        ]
-      },
-      {
-        id: 2,
-        title: "useEffect Hook",
-        type: "practical",
-        content: "useEffect lets you perform side effects in function components. It serves the same purpose as componentDidMount, componentDidUpdate, and componentWillUnmount combined.",
-        codeExample: `useEffect(() => {
-  // Side effect here
-  document.title = \`Count: \${count}\`;
-  
-  // Cleanup function (optional)
-  return () => {
-    document.title = 'React App';
-  };
-}, [count]); // Dependency array`,
-        keyPoints: [
-          "Runs after every render by default",
-          "Dependency array controls when it runs",
-          "Return cleanup function for teardown"
-        ]
-      }
-    ],
-    quiz: {
-      question: "Which statement about React Hooks is correct?",
-      options: [
-        "Hooks can be called inside loops and conditions",
-        "Hooks must always start with 'use' prefix",
-        "Hooks can only be used in class components",
-        "Hooks don't follow any naming conventions"
-      ],
-      correct: 1
-    }
-  };
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      if (isPlaying && progress < 100) {
-        setProgress(prev => Math.min(prev + 0.5, 100));
+    if (!moduleId) return;
+
+    const fetchLessons = async () => {
+      try {
+        setLoading(true);
+        const res = await axios.get(`http://localhost:5000/api/lessons/${moduleId}`);
+        setLessons(res.data);
+        setCurrentLessonIndex(0);
+        setCurrentSection(0);
+        setCompletedSections(new Set());
+        setLoading(false);
+      } catch (err) {
+        setError('Failed to load lessons.');
+        setLoading(false);
       }
-    }, 100);
-    return () => clearInterval(timer);
+    };
+
+    fetchLessons();
+  }, [moduleId]);
+
+  useEffect(() => {
+    if (isPlaying && progress < 100) {
+      const timer = setInterval(() => {
+        setProgress(prev => Math.min(prev + 0.5, 100));
+      }, 100);
+      return () => clearInterval(timer);
+    }
   }, [isPlaying, progress]);
 
+  if (loading) return <div className="p-6 text-center">Loading lessons...</div>;
+  if (error) return <div className="p-6 text-center text-red-600">{error}</div>;
+  if (lessons.length === 0) return <div className="p-6 text-center">No lessons available for this module.</div>;
+
+  const lessonData = lessons[currentLessonIndex];
+
+  if (!lessonData) return null;
+
+  // Assume lessonData.sections is an array; if not, default empty array
+  const sections = lessonData.sections || [];
+
+  const currentSectionData = sections[currentSection] || {};
+
   const handleNext = () => {
-    if (currentSection < lessonData.sections.length - 1) {
+    if (currentSection < sections.length - 1) {
       setCompletedSections(prev => new Set([...prev, currentSection]));
       setCurrentSection(prev => prev + 1);
     } else {
       setCompletedSections(prev => new Set([...prev, currentSection]));
+      // Optionally go to next lesson
+      if (currentLessonIndex < lessons.length - 1) {
+        setCurrentLessonIndex(prev => prev + 1);
+        setCurrentSection(0);
+        setCompletedSections(new Set());
+        setProgress(0);
+      }
     }
   };
 
@@ -104,8 +85,6 @@ setCount(prev => prev + 1);`,
     setCurrentSection(index);
   };
 
-  const currentSectionData = lessonData.sections[currentSection];
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-white to-purple-50">
       {/* Header */}
@@ -115,7 +94,7 @@ setCount(prev => prev + 1);`,
             <div className="flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <BookOpen className="w-6 h-6 text-indigo-600" />
-                <span className="text-sm font-medium text-gray-600">{lessonData.module}</span>
+                <span className="text-sm font-medium text-gray-600">{lessonData.moduleTitle || 'Module'}</span>
               </div>
               <ChevronRight className="w-4 h-4 text-gray-400" />
               <h1 className="text-xl font-bold text-gray-900">{lessonData.title}</h1>
@@ -123,11 +102,11 @@ setCount(prev => prev + 1);`,
             <div className="flex items-center space-x-4 text-sm text-gray-600">
               <div className="flex items-center space-x-1">
                 <Clock className="w-4 h-4" />
-                <span>{lessonData.duration}</span>
+                <span>{lessonData.duration || 'N/A'}</span>
               </div>
               <div className="flex items-center space-x-1">
                 <Award className="w-4 h-4" />
-                <span>{lessonData.difficulty}</span>
+                <span>{lessonData.difficulty || 'N/A'}</span>
               </div>
             </div>
           </div>
@@ -145,21 +124,21 @@ setCount(prev => prev + 1);`,
               <div className="mb-6">
                 <div className="flex justify-between text-sm text-gray-600 mb-2">
                   <span>Overall Progress</span>
-                  <span>{Math.round((completedSections.size / lessonData.sections.length) * 100)}%</span>
+                  <span>{Math.round((completedSections.size / sections.length) * 100)}%</span>
                 </div>
                 <div className="w-full bg-gray-200 rounded-full h-2">
                   <div 
                     className="bg-gradient-to-r from-indigo-500 to-purple-500 h-2 rounded-full transition-all duration-500"
-                    style={{ width: `${(completedSections.size / lessonData.sections.length) * 100}%` }}
+                    style={{ width: `${(completedSections.size / sections.length) * 100}%` }}
                   ></div>
                 </div>
               </div>
 
               {/* Section List */}
               <div className="space-y-2">
-                {lessonData.sections.map((section, index) => (
+                {sections.map((section, index) => (
                   <button
-                    key={section.id}
+                    key={index}
                     onClick={() => handleSectionClick(index)}
                     className={`w-full text-left p-3 rounded-lg transition-all duration-200 ${
                       currentSection === index
@@ -179,8 +158,8 @@ setCount(prev => prev + 1);`,
                           }`} />
                         )}
                         <div>
-                          <div className="font-medium text-sm">{section.title}</div>
-                          <div className="text-xs opacity-70 capitalize">{section.type}</div>
+                          <div className="font-medium text-sm">{section.heading}</div>
+                          <div className="text-xs opacity-70 capitalize">{section.type || ''}</div>
                         </div>
                       </div>
                     </div>
@@ -197,13 +176,13 @@ setCount(prev => prev + 1);`,
               <div className="bg-gradient-to-r from-indigo-500 to-purple-600 p-6 text-white">
                 <div className="flex items-center justify-between">
                   <div>
-                    <h2 className="text-2xl font-bold mb-2">{currentSectionData.title}</h2>
+                    <h2 className="text-2xl font-bold mb-2">{currentSectionData.heading || 'No section'}</h2>
                     <div className="flex items-center space-x-4 text-indigo-100">
                       <span className="text-sm capitalize bg-white/20 px-3 py-1 rounded-full">
-                        {currentSectionData.type}
+                        {currentSectionData.type || ''}
                       </span>
                       <span className="text-sm">
-                        Section {currentSection + 1} of {lessonData.sections.length}
+                        Section {currentSection + 1} of {sections.length}
                       </span>
                     </div>
                   </div>
@@ -238,7 +217,7 @@ setCount(prev => prev + 1);`,
               <div className="p-8">
                 <div className="prose max-w-none">
                   <p className="text-lg text-gray-700 leading-relaxed mb-6">
-                    {currentSectionData.content}
+                    {currentSectionData.content || 'No content available.'}
                   </p>
 
                   {currentSectionData.codeExample && (
@@ -258,20 +237,22 @@ setCount(prev => prev + 1);`,
                   )}
 
                   {/* Key Points */}
-                  <div className="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-r-lg">
-                    <div className="flex items-center mb-3">
-                      <Lightbulb className="w-5 h-5 text-blue-600 mr-2" />
-                      <h4 className="text-lg font-semibold text-blue-900">Key Points</h4>
+                  {currentSectionData.keyPoints && (
+                    <div className="bg-blue-50 border-l-4 border-blue-400 p-6 rounded-r-lg">
+                      <div className="flex items-center mb-3">
+                        <Lightbulb className="w-5 h-5 text-blue-600 mr-2" />
+                        <h4 className="text-lg font-semibold text-blue-900">Key Points</h4>
+                      </div>
+                      <ul className="space-y-2">
+                        {currentSectionData.keyPoints.map((point, index) => (
+                          <li key={index} className="flex items-start space-x-2 text-blue-800">
+                            <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <ul className="space-y-2">
-                      {currentSectionData.keyPoints.map((point, index) => (
-                        <li key={index} className="flex items-start space-x-2 text-blue-800">
-                          <div className="w-2 h-2 bg-blue-400 rounded-full mt-2 flex-shrink-0"></div>
-                          <span>{point}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
+                  )}
                 </div>
               </div>
 
@@ -287,7 +268,7 @@ setCount(prev => prev + 1);`,
                 </button>
 
                 <div className="flex space-x-2">
-                  {lessonData.sections.map((_, index) => (
+                  {sections.map((_, index) => (
                     <div
                       key={index}
                       className={`w-2 h-2 rounded-full ${
@@ -300,10 +281,10 @@ setCount(prev => prev + 1);`,
 
                 <button
                   onClick={handleNext}
-                  disabled={currentSection === lessonData.sections.length - 1 && completedSections.has(currentSection)}
+                  disabled={currentSection === sections.length - 1 && completedSections.has(currentSection)}
                   className="flex items-center space-x-2 px-6 py-3 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                 >
-                  <span>{currentSection === lessonData.sections.length - 1 ? 'Complete' : 'Next'}</span>
+                  <span>{currentSection === sections.length - 1 ? 'Complete' : 'Next'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
