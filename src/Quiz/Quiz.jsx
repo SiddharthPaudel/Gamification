@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { useAuth } from "../AuthContext/AuthContext";
 import {
   ArrowLeft,
   Brain,
@@ -28,7 +29,9 @@ const getDifficultyColor = (difficulty) => {
 };
 
 const formatTime = (seconds) => {
-  return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`;
+  return `${Math.floor(seconds / 60)}:${(seconds % 60)
+    .toString()
+    .padStart(2, "0")}`;
 };
 
 const Quiz = () => {
@@ -45,13 +48,18 @@ const Quiz = () => {
   const [streak, setStreak] = useState(0);
   const [totalXP, setTotalXP] = useState(0);
   const [animateScore, setAnimateScore] = useState(false);
+ 
 
-  const userId = localStorage.getItem("userId");
+const { user ,updateUserProfile} = useAuth();
+const userId = user?.id;
 
+console.log("Current User:", user);
   useEffect(() => {
     const fetchModules = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/modules/get-all-module");
+        const res = await axios.get(
+          "http://localhost:5000/api/modules/get-all-module"
+        );
         const fetchedModulesRaw = res.data.modules || res.data || [];
         const fetchedModules = fetchedModulesRaw.map((m) => ({
           ...m,
@@ -72,7 +80,9 @@ const Quiz = () => {
 
     const fetchQuizzes = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/quiz/${activeModule.id}`);
+        const res = await axios.get(
+          `http://localhost:5000/api/quiz/${activeModule.id}`
+        );
         const data = res.data;
 
         let allQuestions = [];
@@ -148,7 +158,9 @@ const Quiz = () => {
     if (!currentQ || selectedAnswer === null) return;
 
     const selectedOption = currentQ.options[selectedAnswer];
-    const isCorrect = selectedOption.trim().toLowerCase() === currentQ.correctAnswer.trim().toLowerCase();
+    const isCorrect =
+      selectedOption.trim().toLowerCase() ===
+      currentQ.correctAnswer.trim().toLowerCase();
 
     const timeBonus = Math.floor(timeLeft / 5);
 
@@ -180,43 +192,48 @@ const Quiz = () => {
     setShowExplanation(true);
   };
 
-  const handleNextQuestion = async () => {
-    if (!activeModule?.questions?.length) return;
+const handleNextQuestion = async () => {
+  if (!activeModule?.questions?.length) return;
 
-    if (currentQuestion + 1 < activeModule.questions.length) {
-      setCurrentQuestion(currentQuestion + 1);
-      setSelectedAnswer(null);
-      setShowResult(false);
-      setShowExplanation(false);
-      setTimeLeft(30);
-    } else {
-      setQuizCompleted(true);
-
-      const groupedByQuizId = {};
-      answers.forEach((ans) => {
-        if (!groupedByQuizId[ans.quizId]) groupedByQuizId[ans.quizId] = [];
-        groupedByQuizId[ans.quizId].push(ans);
-      });
-
-      try {
-        await Promise.all(
-          Object.entries(groupedByQuizId).map(([quizId, quizAnswers]) => {
-            return axios.post(
-              `http://localhost:5000/api/quiz/attempt/${quizId}/${userId}`,
-              {
-                answers: quizAnswers.map((a) => a.selectedOption),
-              }
-            );
-          })
-        );
-
-        toast.success("XP updated based on quiz results!");
-      } catch (error) {
-        console.error("Failed to update quiz attempt:", error);
-        toast.error("Failed to update XP and badge.");
-      }
+  if (currentQuestion + 1 < activeModule.questions.length) {
+    setCurrentQuestion(currentQuestion + 1);
+    setSelectedAnswer(null);
+    setShowResult(false);
+    setShowExplanation(false);
+    setTimeLeft(30);
+  } else {
+    if (!userId) {
+      toast.error("User not logged in. Please log in again.");
+      return;
     }
-  };
+
+    setQuizCompleted(true);
+
+    const groupedByQuizId = {};
+    answers.forEach((ans) => {
+      if (!groupedByQuizId[ans.quizId]) groupedByQuizId[ans.quizId] = [];
+      groupedByQuizId[ans.quizId].push(ans);
+    });
+
+    try {
+      await Promise.all(
+        Object.entries(groupedByQuizId).map(([quizId, quizAnswers]) => {
+          return axios.post(
+            `http://localhost:5000/api/quiz/attempt/${quizId}/${userId}`,
+            {
+              answers: quizAnswers.map((a) => a.selectedOption),
+            }
+          );
+        })
+      );
+
+      toast.success("XP updated based on quiz results!");
+    } catch (error) {
+      console.error("Failed to update quiz attempt:", error);
+      toast.error("Failed to update XP and badge.");
+    }
+  }
+};
 
   const handleBack = () => {
     setActiveModule(null);
@@ -240,7 +257,9 @@ const Quiz = () => {
             <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
               Quiz Arena 🧠
             </h1>
-            <p className="text-xl text-white/80 mb-2">Challenge your knowledge and earn XP!</p>
+            <p className="text-xl text-white/80 mb-2">
+              Challenge your knowledge and earn XP!
+            </p>
             <div className="flex justify-center items-center gap-4 text-white/60">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5" />
@@ -259,7 +278,9 @@ const Quiz = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {modules.length === 0 ? (
-              <p className="text-white text-center col-span-full">Loading modules...</p>
+              <p className="text-white text-center col-span-full">
+                Loading modules...
+              </p>
             ) : (
               modules.map((module, idx) => (
                 <div
@@ -284,8 +305,12 @@ const Quiz = () => {
                           {module.difficulty || "Unknown"}
                         </span>
                       </div>
-                      <h3 className="text-2xl font-bold text-white mb-2">{module.title}</h3>
-                      <p className="text-white/80 text-sm mb-4">Click to start quiz</p>
+                      <h3 className="text-2xl font-bold text-white mb-2">
+                        {module.title}
+                      </h3>
+                      <p className="text-white/80 text-sm mb-4">
+                        Click to start quiz
+                      </p>
                       <div className="flex justify-between items-center text-white/70 text-sm">
                         <span>Varied questions</span>
                         <span>30s each</span>
@@ -315,21 +340,29 @@ const Quiz = () => {
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 px-4 py-8 flex items-center justify-center">
         <div className="bg-white/10 backdrop-blur-md rounded-3xl p-12 shadow-2xl border border-white/20 max-w-2xl w-full text-center">
           <Trophy className="w-24 h-24 text-yellow-400 mx-auto mb-6 animate-bounce" />
-          <h2 className="text-4xl font-bold text-white mb-6">Quiz Complete! 🎉</h2>
+          <h2 className="text-4xl font-bold text-white mb-6">
+            Quiz Complete! 🎉
+          </h2>
 
           <div className="grid grid-cols-2 gap-8 mb-8 text-white">
             <div className="text-center">
-              <div className="text-4xl font-bold text-yellow-400">{totalXP}</div>
+              <div className="text-4xl font-bold text-yellow-400">
+                {totalXP}
+              </div>
               <div className="text-sm opacity-75">Total XP</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-green-400">{getAccuracy()}%</div>
+              <div className="text-4xl font-bold text-green-400">
+                {getAccuracy()}%
+              </div>
               <div className="text-sm opacity-75">Accuracy</div>
             </div>
           </div>
 
           <div className="bg-white/5 rounded-2xl p-6 mb-8">
-            <h3 className="text-white font-semibold mb-4">Performance Breakdown</h3>
+            <h3 className="text-white font-semibold mb-4">
+              Performance Breakdown
+            </h3>
             <div className="space-y-3 text-sm text-white/80">
               {answers.map((answer, index) => (
                 <div key={index} className="flex justify-between items-center">
@@ -369,7 +402,8 @@ const Quiz = () => {
   }
 
   const currentQ = activeModule.questions[currentQuestion];
-  const progress = ((currentQuestion + 1) / activeModule.questions.length) * 100;
+  const progress =
+    ((currentQuestion + 1) / activeModule.questions.length) * 100;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 px-4 py-8">
@@ -388,12 +422,16 @@ const Quiz = () => {
               <div className="flex items-center gap-2">
                 <Zap
                   className={`w-5 h-5 ${
-                    animateScore ? "text-yellow-400 scale-110" : "text-yellow-400"
+                    animateScore
+                      ? "text-yellow-400 scale-110"
+                      : "text-yellow-400"
                   } transition-all duration-300`}
                 />
                 <span
                   className={`font-bold ${
-                    animateScore ? "text-yellow-400 scale-110" : "text-yellow-400"
+                    animateScore
+                      ? "text-yellow-400 scale-110"
+                      : "text-yellow-400"
                   } transition-all duration-300`}
                 >
                   {totalXP} XP
@@ -402,12 +440,22 @@ const Quiz = () => {
               {streak > 0 && (
                 <div className="flex items-center gap-2">
                   <Star className="w-5 h-5 text-orange-400" />
-                  <span className="font-bold text-orange-400">{streak} streak</span>
+                  <span className="font-bold text-orange-400">
+                    {streak} streak
+                  </span>
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <Timer className={`w-5 h-5 ${timeLeft <= 10 ? "text-red-400" : "text-blue-400"}`} />
-                <span className={`font-bold ${timeLeft <= 10 ? "text-red-400" : ""}`}>
+                <Timer
+                  className={`w-5 h-5 ${
+                    timeLeft <= 10 ? "text-red-400" : "text-blue-400"
+                  }`}
+                />
+                <span
+                  className={`font-bold ${
+                    timeLeft <= 10 ? "text-red-400" : ""
+                  }`}
+                >
                   {formatTime(timeLeft)}
                 </span>
               </div>
@@ -436,7 +484,9 @@ const Quiz = () => {
         <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20 mb-8">
           <div className="text-center mb-8">
             <Brain className="w-12 h-12 text-white mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-white mb-2">{currentQ.question}</h3>
+            <h3 className="text-2xl font-bold text-white mb-2">
+              {currentQ.question}
+            </h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -450,10 +500,16 @@ const Quiz = () => {
                     ? "bg-blue-500 text-white border-blue-400 shadow-lg"
                     : "bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/40";
               } else {
-                if (index === currentQ.correctAnswer) {
-                  buttonClass += "bg-green-500 text-white border-green-400 shadow-lg";
-                } else if (selectedAnswer === index && selectedAnswer !== currentQ.correctAnswer) {
-                  buttonClass += "bg-red-500 text-white border-red-400 shadow-lg";
+                const isCorrectOption =
+                  currentQ.options[index].trim().toLowerCase() ===
+                  currentQ.correctAnswer.trim().toLowerCase();
+
+                if (isCorrectOption) {
+                  buttonClass +=
+                    "bg-green-500 text-white border-green-400 shadow-lg";
+                } else if (selectedAnswer === index && !isCorrectOption) {
+                  buttonClass +=
+                    "bg-red-500 text-white border-red-400 shadow-lg";
                 } else {
                   buttonClass += "bg-white/10 text-white/60 border-white/20";
                 }
@@ -474,9 +530,11 @@ const Quiz = () => {
                     {showResult && index === currentQ.correctAnswer && (
                       <CheckCircle className="w-6 h-6 ml-auto" />
                     )}
-                    {showResult && selectedAnswer === index && selectedAnswer !== currentQ.correctAnswer && (
-                      <XCircle className="w-6 h-6 ml-auto" />
-                    )}
+                    {showResult &&
+                      selectedAnswer === index &&
+                      selectedAnswer !== currentQ.correctAnswer && (
+                        <XCircle className="w-6 h-6 ml-auto" />
+                      )}
                   </div>
                 </button>
               );
@@ -507,13 +565,15 @@ const Quiz = () => {
                 onClick={handleNextQuestion}
                 className="px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold text-lg"
               >
-                {currentQuestion + 1 < activeModule.questions.length ? "Next Question" : "View Results"}
+                {currentQuestion + 1 < activeModule.questions.length
+                  ? "Next Question"
+                  : "View Results"}
               </button>
             )}
           </div>
         </div>
       </div>
-
+{/* 
       <style jsx>{`
         @keyframes fadeIn {
           from {
@@ -528,7 +588,7 @@ const Quiz = () => {
         .animate-fadeIn {
           animation: fadeIn 0.5s ease-out;
         }
-      `}</style>
+      `}</style> */}
     </div>
   );
 };
