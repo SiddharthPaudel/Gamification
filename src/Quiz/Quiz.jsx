@@ -192,6 +192,8 @@ console.log("Current User:", user);
     setShowExplanation(true);
   };
 
+
+
 const handleNextQuestion = async () => {
   if (!activeModule?.questions?.length) return;
 
@@ -216,24 +218,46 @@ const handleNextQuestion = async () => {
     });
 
     try {
-      await Promise.all(
-        Object.entries(groupedByQuizId).map(([quizId, quizAnswers]) => {
-          return axios.post(
+      // Call API and get responses for all quizzes attempted
+      const responses = await Promise.all(
+        Object.entries(groupedByQuizId).map(([quizId, quizAnswers]) =>
+          axios.post(
             `http://localhost:5000/api/quiz/attempt/${quizId}/${userId}`,
             {
               answers: quizAnswers.map((a) => a.selectedOption),
             }
-          );
-        })
+          )
+        )
       );
 
-      toast.success("XP updated based on quiz results!");
+      // Example: take last response (or merge all if multiple quizzes)
+      const lastResponse = responses[responses.length - 1];
+      const data = lastResponse.data;
+
+      // Construct updated user object merging existing with backend data
+      const updatedUser = {
+        ...user,
+        xp: data.currentXP ?? user.xp,
+        level: data.newLevel ?? user.level,
+        badges: data.badges ?? user.badges,
+        gameProgress: {
+          ...user.gameProgress,
+          quiz: data.gameProgress ?? user.gameProgress.quiz,
+        },
+        // optionally update completedTasks if backend sends it
+      };
+
+      // Update context and localStorage
+      updateUserProfile(updatedUser);
+
+      toast.success("XP and badges updated based on quiz results!");
     } catch (error) {
       console.error("Failed to update quiz attempt:", error);
-      toast.error("Failed to update XP and badge.");
+      toast.error("Failed to update XP and badges.");
     }
   }
 };
+
 
   const handleBack = () => {
     setActiveModule(null);
@@ -381,13 +405,13 @@ const handleNextQuestion = async () => {
           </div>
 
           <div className="flex gap-4 justify-center">
-            <button
+            {/* <button
               onClick={() => handleModuleClick(activeModule)}
               className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-2xl hover:from-green-700 hover:to-green-800 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
               <RotateCcw className="w-5 h-5" />
               Retry Quiz
-            </button>
+            </button> */}
             <button
               onClick={handleBack}
               className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
