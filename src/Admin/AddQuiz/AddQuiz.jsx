@@ -1,94 +1,163 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { Plus } from 'lucide-react';
+import toast from 'react-hot-toast'; // ✅ import toast
 
 const Quiz = () => {
-  const [quizzes, setQuizzes] = useState([
-    { id: 1, title: "React Basics Quiz", questions: 10, attempts: 234, module: "React Fundamentals" },
-    { id: 2, title: "JavaScript Functions", questions: 15, attempts: 187, module: "JavaScript Basics" },
-    { id: 3, title: "CSS Flexbox", questions: 8, attempts: 156, module: "CSS Styling" },
-    { id: 4, title: "Node.js Fundamentals", questions: 12, attempts: 89, module: "Node.js Backend" },
-    { id: 5, title: "Advanced React Hooks", questions: 20, attempts: 145, module: "React Fundamentals" },
-    { id: 6, title: "JavaScript ES6", questions: 18, attempts: 203, module: "JavaScript Basics" }
-  ]);
+  const [quizzes, setQuizzes] = useState([]);
+  const [modules, setModules] = useState([]);
+  const [title, setTitle] = useState('');
+  const [questions, setQuestions] = useState([{ question: '', options: [], correctAnswer: '' }]);
+  const [selectedModule, setSelectedModule] = useState('');
 
-  const handleCreateQuiz = () => {
-    console.log('Create new quiz');
-    alert('Create new quiz functionality');
-  };
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const res = await axios.get('http://localhost:5000/api/modules/get-all-module');
+        const fetchedModules = res.data.modules || res.data || [];
+        setModules(fetchedModules);
+      } catch (error) {
+        console.error('Failed to fetch modules:', error);
+        toast.error('Failed to load modules');
+      }
+    };
 
-  const handleEditQuiz = (quizId) => {
-    console.log('Edit quiz:', quizId);
-    alert(`Edit quiz with ID: ${quizId}`);
-  };
+    fetchModules();
+  }, []);
 
-  const handleViewQuiz = (quizId) => {
-    console.log('View quiz:', quizId);
-    alert(`View quiz with ID: ${quizId}`);
-  };
-
-  const handleDeleteQuiz = (quizId) => {
-    if (window.confirm('Are you sure you want to delete this quiz?')) {
-      setQuizzes(quizzes.filter(quiz => quiz.id !== quizId));
+  const handleCreateQuiz = async () => {
+    if (!title || !selectedModule || questions.length === 0) {
+      return toast.error('Please fill all fields');
     }
+
+    try {
+      const res = await axios.post(`http://localhost:5000/api/quiz/${selectedModule}`, {
+        title,
+        questions
+      });
+
+      const newQuiz = res.data.quiz;
+      setQuizzes([...quizzes, {
+        id: newQuiz._id,
+        title: newQuiz.title,
+        questions: newQuiz.questions.length,
+        attempts: 0,
+        module: modules.find(m => m._id === selectedModule)?.title || 'Unknown'
+      }]);
+
+      setTitle('');
+      setQuestions([{ question: '', options: [], correctAnswer: '' }]);
+      setSelectedModule('');
+
+      toast.success('Quiz created successfully!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to create quiz');
+    }
+  };
+
+  const handleAddQuestion = () => {
+    setQuestions([...questions, { question: '', options: [], correctAnswer: '' }]);
+  };
+
+  const handleQuestionChange = (index, field, value) => {
+    const updated = [...questions];
+    if (field === 'options') {
+      updated[index][field] = value.split(',').map(opt => opt.trim());
+    } else {
+      updated[index][field] = value;
+    }
+    setQuestions(updated);
   };
 
   return (
     <div className="bg-white p-6 rounded-lg shadow-sm border">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Quiz Management</h2>
-        <button 
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold mb-4">Create New Quiz</h2>
+
+        <div className="mb-3">
+          <label className="block mb-1">Quiz Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={e => setTitle(e.target.value)}
+            className="border p-2 rounded w-full"
+            placeholder="Enter quiz title"
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="block mb-1">Select Module</label>
+          <select
+            value={selectedModule}
+            onChange={e => setSelectedModule(e.target.value)}
+            className="border p-2 rounded w-full"
+          >
+            <option value="">-- Select Module --</option>
+            {modules.map(module => (
+              <option key={module._id} value={module._id}>
+                {module.title}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="mb-4">
+          <h3 className="font-semibold mb-2">Questions</h3>
+          {questions.map((q, idx) => (
+            <div key={idx} className="mb-4 p-3 border rounded">
+              <input
+                type="text"
+                placeholder="Question"
+                value={q.question}
+                onChange={e => handleQuestionChange(idx, 'question', e.target.value)}
+                className="border p-2 rounded w-full mb-2"
+              />
+              <input
+                type="text"
+                placeholder="Options (comma separated)"
+                value={q.options.join(', ')}
+                onChange={e => handleQuestionChange(idx, 'options', e.target.value)}
+                className="border p-2 rounded w-full mb-2"
+              />
+              <input
+                type="text"
+                placeholder="Correct Answer"
+                value={q.correctAnswer}
+                onChange={e => handleQuestionChange(idx, 'correctAnswer', e.target.value)}
+                className="border p-2 rounded w-full"
+              />
+            </div>
+          ))}
+          <button
+            onClick={handleAddQuestion}
+            className="text-sm text-blue-600 hover:underline"
+          >
+            + Add another question
+          </button>
+        </div>
+
+        <button
           onClick={handleCreateQuiz}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
-          <Plus className="w-4 h-4 mr-2" />
           Create Quiz
         </button>
       </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {quizzes.map((quiz) => (
-          <div key={quiz.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-            <h3 className="font-semibold text-lg mb-2">{quiz.title}</h3>
-            <p className="text-sm text-gray-600 mb-3">{quiz.module}</p>
-            <div className="flex justify-between text-sm mb-4">
-              <span>{quiz.questions} Questions</span>
-              <span>{quiz.attempts} Attempts</span>
+
+      <div className="mt-10">
+        <h2 className="text-xl font-semibold mb-4">Existing Quizzes</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {quizzes.map((quiz, index) => (
+            <div key={index} className="border p-4 rounded shadow-sm">
+              <h3 className="font-semibold text-lg">{quiz.title}</h3>
+              <p className="text-sm text-gray-500 mb-2">{quiz.module}</p>
+              <p className="text-sm">{quiz.questions} Questions</p>
+              <p className="text-sm">{quiz.attempts} Attempts</p>
             </div>
-            <div className="flex space-x-2">
-              <button 
-                onClick={() => handleEditQuiz(quiz.id)}
-                className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded hover:bg-blue-200 transition-colors"
-              >
-                Edit
-              </button>
-              <button 
-                onClick={() => handleViewQuiz(quiz.id)}
-                className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded hover:bg-gray-200 transition-colors"
-              >
-                View
-              </button>
-              <button 
-                onClick={() => handleDeleteQuiz(quiz.id)}
-                className="px-3 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
-              >
-                Delete
-              </button>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {quizzes.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">No quizzes available</p>
-          <button 
-            onClick={handleCreateQuiz}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Create Your First Quiz
-          </button>
+          ))}
         </div>
-      )}
+      </div>
     </div>
   );
 };

@@ -1,181 +1,38 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
-  BookOpenCheck,
-  Globe,
-  Calculator,
-  Code,
   ArrowLeft,
-  Trophy,
-  Target,
-  Clock,
-  Zap,
-  CheckCircle,
-  XCircle,
-  Star,
-  Award,
   Brain,
+  CheckCircle,
+  RotateCcw,
+  Star,
+  Target,
   Timer,
-  RotateCcw
+  Trophy,
+  XCircle,
+  Zap,
 } from "lucide-react";
+import toast from "react-hot-toast";
 
-const quizModules = [
-  {
-    id: 1,
-    title: "General Knowledge",
-    icon: Globe,
-    gradient: "from-yellow-400 to-orange-500",
-    bgColor: "bg-yellow-50",
-    emoji: "🌍",
-    description: "Test your worldly wisdom",
-    difficulty: "Easy",
-    questions: [
-      {
-        question: "What is the capital of France?",
-        options: ["Paris", "Rome", "Berlin", "Madrid"],
-        correctAnswer: 0,
-        explanation: "Paris has been the capital of France since 987 AD!"
-      },
-      {
-        question: "Which ocean is the largest?",
-        options: ["Atlantic", "Indian", "Pacific", "Arctic"],
-        correctAnswer: 2,
-        explanation: "The Pacific Ocean covers about 46% of the world's water surface!"
-      },
-      {
-        question: "Who painted the Mona Lisa?",
-        options: ["Vincent van Gogh", "Leonardo da Vinci", "Pablo Picasso", "Michelangelo"],
-        correctAnswer: 1,
-        explanation: "Leonardo da Vinci painted this masterpiece between 1503-1519!"
-      },
-      {
-        question: "What is the largest continent?",
-        options: ["Africa", "North America", "Asia", "Europe"],
-        correctAnswer: 2,
-        explanation: "Asia covers about 30% of Earth's total surface area!"
-      }
-    ],
-  },
-  {
-    id: 2,
-    title: "Mathematics",
-    icon: Calculator,
-    gradient: "from-green-400 to-emerald-500",
-    bgColor: "bg-green-50",
-    emoji: "🔢",
-    description: "Challenge your number skills",
-    difficulty: "Medium",
-    questions: [
-      {
-        question: "What is 12 × 8?",
-        options: ["96", "88", "108", "112"],
-        correctAnswer: 0,
-        explanation: "12 × 8 = 96. Remember: 12 × 8 = (10 × 8) + (2 × 8) = 80 + 16 = 96!"
-      },
-      {
-        question: "What is the square root of 144?",
-        options: ["12", "14", "10", "16"],
-        correctAnswer: 0,
-        explanation: "√144 = 12, because 12 × 12 = 144!"
-      },
-      {
-        question: "What is 15% of 200?",
-        options: ["25", "30", "35", "40"],
-        correctAnswer: 1,
-        explanation: "15% of 200 = 0.15 × 200 = 30!"
-      },
-      {
-        question: "If a triangle has angles of 60°, 60°, what's the third angle?",
-        options: ["45°", "90°", "60°", "120°"],
-        correctAnswer: 2,
-        explanation: "In any triangle, all angles sum to 180°. So 180° - 60° - 60° = 60°!"
-      }
-    ],
-  },
-  {
-    id: 3,
-    title: "Science",
-    icon: BookOpenCheck,
-    gradient: "from-blue-400 to-indigo-500",
-    bgColor: "bg-blue-50",
-    emoji: "🔬",
-    description: "Explore the wonders of science",
-    difficulty: "Medium",
-    questions: [
-      {
-        question: "What planet is known as the Red Planet?",
-        options: ["Mars", "Venus", "Jupiter", "Saturn"],
-        correctAnswer: 0,
-        explanation: "Mars appears red due to iron oxide (rust) on its surface!"
-      },
-      {
-        question: "What gas do plants absorb during photosynthesis?",
-        options: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"],
-        correctAnswer: 2,
-        explanation: "Plants absorb CO₂ and release oxygen during photosynthesis!"
-      },
-      {
-        question: "How many bones are in an adult human body?",
-        options: ["196", "206", "216", "226"],
-        correctAnswer: 1,
-        explanation: "An adult human has 206 bones, while babies are born with about 270!"
-      },
-      {
-        question: "What is the chemical symbol for gold?",
-        options: ["Go", "Gd", "Au", "Ag"],
-        correctAnswer: 2,
-        explanation: "Au comes from the Latin word 'aurum' meaning gold!"
-      }
-    ],
-  },
-  {
-    id: 4,
-    title: "Programming",
-    icon: Code,
-    gradient: "from-purple-400 to-pink-500",
-    bgColor: "bg-purple-50",
-    emoji: "💻",
-    description: "Code your way to victory",
-    difficulty: "Hard",
-    questions: [
-      {
-        question: "Which language runs natively in web browsers?",
-        options: ["Python", "Java", "C++", "JavaScript"],
-        correctAnswer: 3,
-        explanation: "JavaScript is the only language that runs natively in all web browsers!"
-      },
-      {
-        question: "What does HTML stand for?",
-        options: [
-          "Hyper Text Markup Language",
-          "Hot Mail",
-          "How to Make Links",
-          "Home Tool Markup Language",
-        ],
-        correctAnswer: 0,
-        explanation: "HTML is the standard markup language for creating web pages!"
-      },
-      {
-        question: "What does CSS stand for?",
-        options: [
-          "Computer Style Sheets",
-          "Cascading Style Sheets",
-          "Creative Style System",
-          "Code Style Standard"
-        ],
-        correctAnswer: 1,
-        explanation: "CSS controls the presentation and styling of web pages!"
-      },
-      {
-        question: "Which of these is NOT a JavaScript framework?",
-        options: ["React", "Angular", "Django", "Vue"],
-        correctAnswer: 2,
-        explanation: "Django is a Python web framework, not JavaScript!"
-      }
-    ],
-  },
-];
+const getDifficultyColor = (difficulty) => {
+  switch (difficulty) {
+    case "Easy":
+      return "text-green-600 bg-green-100";
+    case "Medium":
+      return "text-yellow-600 bg-yellow-100";
+    case "Hard":
+      return "text-red-600 bg-red-100";
+    default:
+      return "text-gray-600 bg-gray-100";
+  }
+};
+
+const formatTime = (seconds) => {
+  return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, "0")}`;
+};
 
 const Quiz = () => {
+  const [modules, setModules] = useState([]);
   const [activeModule, setActiveModule] = useState(null);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [selectedAnswer, setSelectedAnswer] = useState(null);
@@ -189,6 +46,71 @@ const Quiz = () => {
   const [totalXP, setTotalXP] = useState(0);
   const [animateScore, setAnimateScore] = useState(false);
 
+  const userId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/modules/get-all-module");
+        const fetchedModulesRaw = res.data.modules || res.data || [];
+        const fetchedModules = fetchedModulesRaw.map((m) => ({
+          ...m,
+          id: m.id || m._id,
+        }));
+        setModules(fetchedModules);
+      } catch (error) {
+        console.error("Failed to fetch modules:", error);
+        toast.error("Failed to load modules");
+      }
+    };
+
+    fetchModules();
+  }, []);
+
+  useEffect(() => {
+    if (!activeModule || !activeModule.id) return;
+
+    const fetchQuizzes = async () => {
+      try {
+        const res = await axios.get(`http://localhost:5000/api/quiz/${activeModule.id}`);
+        const data = res.data;
+
+        let allQuestions = [];
+        data.forEach((quiz) => {
+          if (quiz.questions && quiz.questions.length) {
+            allQuestions = allQuestions.concat(
+              quiz.questions.map((q) => ({
+                ...q,
+                quizId: quiz._id || quiz.id,
+              }))
+            );
+          }
+        });
+
+        setActiveModule((prev) => ({
+          ...prev,
+          questions: allQuestions,
+        }));
+
+        setCurrentQuestion(0);
+        setSelectedAnswer(null);
+        setShowResult(false);
+        setScore(0);
+        setTimeLeft(30);
+        setQuizCompleted(false);
+        setAnswers([]);
+        setShowExplanation(false);
+        setStreak(0);
+        setTotalXP(0);
+      } catch (err) {
+        console.error("Failed to fetch quizzes:", err);
+        alert("Failed to load quizzes for this module.");
+      }
+    };
+
+    fetchQuizzes();
+  }, [activeModule?.id]);
+
   useEffect(() => {
     let timer;
     if (activeModule && !quizCompleted && !showResult && timeLeft > 0) {
@@ -200,22 +122,15 @@ const Quiz = () => {
   }, [timeLeft, activeModule, quizCompleted, showResult]);
 
   const handleModuleClick = (module) => {
-    setActiveModule(module);
-    setCurrentQuestion(0);
-    setSelectedAnswer(null);
-    setShowResult(false);
-    setScore(0);
-    setTimeLeft(30);
-    setQuizCompleted(false);
-    setAnswers([]);
-    setShowExplanation(false);
-    setStreak(0);
-    setTotalXP(0);
+    setActiveModule({
+      ...module,
+      questions: [],
+    });
   };
 
   const handleTimeUp = () => {
     if (selectedAnswer === null) {
-      setSelectedAnswer(-1); // Mark as timeout
+      setSelectedAnswer(-1);
     }
     handleAnswerSubmit();
   };
@@ -227,34 +142,47 @@ const Quiz = () => {
   };
 
   const handleAnswerSubmit = () => {
+    if (!activeModule?.questions?.length) return;
+
     const currentQ = activeModule.questions[currentQuestion];
-    const isCorrect = selectedAnswer === currentQ.correctAnswer;
+    if (!currentQ || selectedAnswer === null) return;
+
+    const selectedOption = currentQ.options[selectedAnswer];
+    const isCorrect = selectedOption.trim().toLowerCase() === currentQ.correctAnswer.trim().toLowerCase();
+
     const timeBonus = Math.floor(timeLeft / 5);
-    
+
     if (isCorrect) {
-      const points = 100 + timeBonus + (streak * 10);
-      setScore(prev => prev + points);
-      setTotalXP(prev => prev + points);
-      setStreak(prev => prev + 1);
+      const points = 100 + timeBonus + streak * 10;
+      setScore((prev) => prev + points);
+      setTotalXP((prev) => prev + points);
+      setStreak((prev) => prev + 1);
       setAnimateScore(true);
       setTimeout(() => setAnimateScore(false), 600);
     } else {
       setStreak(0);
     }
 
-    setAnswers(prev => [...prev, {
-      questionIndex: currentQuestion,
-      selectedAnswer,
-      isCorrect,
-      timeLeft,
-      points: isCorrect ? 100 + timeBonus + (streak * 10) : 0
-    }]);
+    setAnswers((prev) => [
+      ...prev,
+      {
+        questionIndex: currentQuestion,
+        selectedAnswer,
+        selectedOption,
+        isCorrect,
+        timeLeft,
+        points: isCorrect ? 100 + timeBonus + streak * 10 : 0,
+        quizId: currentQ.quizId,
+      },
+    ]);
 
     setShowResult(true);
     setShowExplanation(true);
   };
 
-  const handleNextQuestion = () => {
+  const handleNextQuestion = async () => {
+    if (!activeModule?.questions?.length) return;
+
     if (currentQuestion + 1 < activeModule.questions.length) {
       setCurrentQuestion(currentQuestion + 1);
       setSelectedAnswer(null);
@@ -263,6 +191,30 @@ const Quiz = () => {
       setTimeLeft(30);
     } else {
       setQuizCompleted(true);
+
+      const groupedByQuizId = {};
+      answers.forEach((ans) => {
+        if (!groupedByQuizId[ans.quizId]) groupedByQuizId[ans.quizId] = [];
+        groupedByQuizId[ans.quizId].push(ans);
+      });
+
+      try {
+        await Promise.all(
+          Object.entries(groupedByQuizId).map(([quizId, quizAnswers]) => {
+            return axios.post(
+              `http://localhost:5000/api/quiz/attempt/${quizId}/${userId}`,
+              {
+                answers: quizAnswers.map((a) => a.selectedOption),
+              }
+            );
+          })
+        );
+
+        toast.success("XP updated based on quiz results!");
+      } catch (error) {
+        console.error("Failed to update quiz attempt:", error);
+        toast.error("Failed to update XP and badge.");
+      }
     }
   };
 
@@ -276,21 +228,8 @@ const Quiz = () => {
 
   const getAccuracy = () => {
     if (answers.length === 0) return 0;
-    const correct = answers.filter(a => a.isCorrect).length;
+    const correct = answers.filter((a) => a.isCorrect).length;
     return Math.round((correct / answers.length) * 100);
-  };
-
-  const getDifficultyColor = (difficulty) => {
-    switch(difficulty) {
-      case 'Easy': return 'text-green-600 bg-green-100';
-      case 'Medium': return 'text-yellow-600 bg-yellow-100';
-      case 'Hard': return 'text-red-600 bg-red-100';
-      default: return 'text-gray-600 bg-gray-100';
-    }
-  };
-
-  const formatTime = (seconds) => {
-    return `${Math.floor(seconds / 60)}:${(seconds % 60).toString().padStart(2, '0')}`;
   };
 
   if (!activeModule) {
@@ -301,9 +240,7 @@ const Quiz = () => {
             <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
               Quiz Arena 🧠
             </h1>
-            <p className="text-xl text-white/80 mb-2">
-              Challenge your knowledge and earn XP!
-            </p>
+            <p className="text-xl text-white/80 mb-2">Challenge your knowledge and earn XP!</p>
             <div className="flex justify-center items-center gap-4 text-white/60">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5" />
@@ -321,35 +258,54 @@ const Quiz = () => {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {quizModules.map((module) => (
-              <div
-                key={module.id}
-                className="group cursor-pointer transform hover:scale-105 transition-all duration-300"
-                onClick={() => handleModuleClick(module)}
-              >
-                <div className={`bg-gradient-to-br ${module.gradient} rounded-3xl p-8 shadow-2xl hover:shadow-3xl transition-all duration-300 border border-white/20 relative overflow-hidden`}>
-                  <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full" />
-                  <div className="relative">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="text-4xl group-hover:scale-110 transition-transform duration-300">
-                        {module.emoji}
+            {modules.length === 0 ? (
+              <p className="text-white text-center col-span-full">Loading modules...</p>
+            ) : (
+              modules.map((module, idx) => (
+                <div
+                  key={module.id || module._id || idx}
+                  className="group cursor-pointer transform hover:scale-105 transition-all duration-300"
+                  onClick={() => handleModuleClick(module)}
+                >
+                  <div
+                    className={`rounded-3xl p-8 shadow-2xl transition-all duration-300 border border-white/20 relative overflow-hidden bg-white/10`}
+                  >
+                    <div className="absolute top-0 right-0 -mt-4 -mr-4 w-24 h-24 bg-white/10 rounded-full" />
+                    <div className="relative">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="text-4xl group-hover:scale-110 transition-transform duration-300">
+                          {module.emoji || "❓"}
+                        </div>
+                        <span
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(
+                            module.difficulty
+                          )}`}
+                        >
+                          {module.difficulty || "Unknown"}
+                        </span>
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getDifficultyColor(module.difficulty)}`}>
-                        {module.difficulty}
-                      </span>
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-2">{module.title}</h3>
-                    <p className="text-white/80 text-sm mb-4">{module.description}</p>
-                    <div className="flex justify-between items-center text-white/70 text-sm">
-                      <span>{module.questions.length} questions</span>
-                      <span>30s each</span>
+                      <h3 className="text-2xl font-bold text-white mb-2">{module.title}</h3>
+                      <p className="text-white/80 text-sm mb-4">Click to start quiz</p>
+                      <div className="flex justify-between items-center text-white/70 text-sm">
+                        <span>Varied questions</span>
+                        <span>30s each</span>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
+      </div>
+    );
+  }
+
+  // If activeModule.questions is empty or undefined
+  if (!activeModule.questions || activeModule.questions.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white text-xl bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 px-4 py-8">
+        Loading questions...
       </div>
     );
   }
@@ -360,7 +316,7 @@ const Quiz = () => {
         <div className="bg-white/10 backdrop-blur-md rounded-3xl p-12 shadow-2xl border border-white/20 max-w-2xl w-full text-center">
           <Trophy className="w-24 h-24 text-yellow-400 mx-auto mb-6 animate-bounce" />
           <h2 className="text-4xl font-bold text-white mb-6">Quiz Complete! 🎉</h2>
-          
+
           <div className="grid grid-cols-2 gap-8 mb-8 text-white">
             <div className="text-center">
               <div className="text-4xl font-bold text-yellow-400">{totalXP}</div>
@@ -430,8 +386,16 @@ const Quiz = () => {
             </button>
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
-                <Zap className="w-5 h-5 text-yellow-400" />
-                <span className={`font-bold ${animateScore ? 'text-yellow-400 scale-110' : ''} transition-all duration-300`}>
+                <Zap
+                  className={`w-5 h-5 ${
+                    animateScore ? "text-yellow-400 scale-110" : "text-yellow-400"
+                  } transition-all duration-300`}
+                />
+                <span
+                  className={`font-bold ${
+                    animateScore ? "text-yellow-400 scale-110" : "text-yellow-400"
+                  } transition-all duration-300`}
+                >
                   {totalXP} XP
                 </span>
               </div>
@@ -442,26 +406,26 @@ const Quiz = () => {
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <Timer className={`w-5 h-5 ${timeLeft <= 10 ? 'text-red-400' : 'text-blue-400'}`} />
-                <span className={`font-bold ${timeLeft <= 10 ? 'text-red-400' : ''}`}>
+                <Timer className={`w-5 h-5 ${timeLeft <= 10 ? "text-red-400" : "text-blue-400"}`} />
+                <span className={`font-bold ${timeLeft <= 10 ? "text-red-400" : ""}`}>
                   {formatTime(timeLeft)}
                 </span>
               </div>
             </div>
           </div>
-          
+
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-2xl font-bold flex items-center gap-3">
-              <span className="text-3xl">{activeModule.emoji}</span>
+              <span className="text-3xl">{activeModule.emoji || "❓"}</span>
               {activeModule.title}
             </h2>
             <span className="text-white/70">
               Question {currentQuestion + 1} of {activeModule.questions.length}
             </span>
           </div>
-          
+
           <div className="w-full bg-white/20 rounded-full h-3">
-            <div 
+            <div
               className="bg-gradient-to-r from-green-400 to-blue-500 h-3 rounded-full transition-all duration-500"
               style={{ width: `${progress}%` }}
             />
@@ -472,19 +436,19 @@ const Quiz = () => {
         <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 shadow-2xl border border-white/20 mb-8">
           <div className="text-center mb-8">
             <Brain className="w-12 h-12 text-white mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-white mb-2">
-              {currentQ.question}
-            </h3>
+            <h3 className="text-2xl font-bold text-white mb-2">{currentQ.question}</h3>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
             {currentQ.options.map((option, index) => {
-              let buttonClass = "p-6 rounded-2xl text-left transition-all duration-300 transform hover:scale-105 border-2 ";
-              
+              let buttonClass =
+                "p-6 rounded-2xl text-left transition-all duration-300 transform hover:scale-105 border-2 ";
+
               if (!showResult) {
-                buttonClass += selectedAnswer === index 
-                  ? "bg-blue-500 text-white border-blue-400 shadow-lg" 
-                  : "bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/40";
+                buttonClass +=
+                  selectedAnswer === index
+                    ? "bg-blue-500 text-white border-blue-400 shadow-lg"
+                    : "bg-white/10 text-white border-white/20 hover:bg-white/20 hover:border-white/40";
               } else {
                 if (index === currentQ.correctAnswer) {
                   buttonClass += "bg-green-500 text-white border-green-400 shadow-lg";
@@ -543,7 +507,7 @@ const Quiz = () => {
                 onClick={handleNextQuestion}
                 className="px-8 py-4 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-2xl hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 font-semibold text-lg"
               >
-                {currentQuestion + 1 < activeModule.questions.length ? 'Next Question' : 'View Results'}
+                {currentQuestion + 1 < activeModule.questions.length ? "Next Question" : "View Results"}
               </button>
             )}
           </div>
@@ -552,8 +516,14 @@ const Quiz = () => {
 
       <style jsx>{`
         @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(20px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .animate-fadeIn {
           animation: fadeIn 0.5s ease-out;
