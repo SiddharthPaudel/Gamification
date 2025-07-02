@@ -164,16 +164,18 @@ console.log("Current User:", user);
 
     const timeBonus = Math.floor(timeLeft / 5);
 
-    if (isCorrect) {
-      const points = 100 + timeBonus + streak * 10;
-      setScore((prev) => prev + points);
-      setTotalXP((prev) => prev + points);
-      setStreak((prev) => prev + 1);
-      setAnimateScore(true);
-      setTimeout(() => setAnimateScore(false), 600);
-    } else {
-      setStreak(0);
-    }
+if (isCorrect) {
+  const nextStreak = streak + 1;
+  const points =  isCorrect ? 10 : 0; // use current streak for now
+  setScore((prev) => prev + points);
+  setTotalXP((prev) => prev + points);
+  setStreak(nextStreak);
+  setAnimateScore(true);
+  setTimeout(() => setAnimateScore(false), 600);
+} else {
+  setStreak(0);
+}
+
 
     setAnswers((prev) => [
       ...prev,
