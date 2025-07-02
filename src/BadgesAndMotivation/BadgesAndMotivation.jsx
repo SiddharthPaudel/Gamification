@@ -1,12 +1,19 @@
-import { Trophy, TrendingUp, Star, Award, Zap, Target, Brain, Code, Users } from 'lucide-react';
-const BadgesAndMotivation = ({ badges }) => {
+import React from 'react';
+import { Trophy, TrendingUp, Star, Award, Zap, Target, Brain, Code } from 'lucide-react';
+import { useAuth } from '../AuthContext/AuthContext';
+
+const BadgesAndMotivation = () => {
+  const { user } = useAuth(); // Access badges from context
+
   const badgeIcons = {
     "First Quiz": Target,
     "Speed Learner": Zap,
     "Code Master": Code,
     "Flashcard Pro": Brain,
-    "Problem Solver": Award
+    "Problem Solver": Award,
   };
+
+  const badges = user?.badges || []; // fallback to empty array
 
   return (
     <div className="space-y-6">
@@ -16,19 +23,26 @@ const BadgesAndMotivation = ({ badges }) => {
           <Award className="w-6 h-6 mr-2 text-yellow-500" />
           Your Achievements
         </h3>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {badges.map((badge, index) => {
-            const IconComponent = badgeIcons[badge] || Star;
-            return (
-              <div key={index} className="flex flex-col items-center p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border border-yellow-200 hover:shadow-md transition-shadow duration-300">
-                <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mb-2">
-                  <IconComponent className="w-6 h-6 text-white" />
+        {badges.length > 0 ? (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+            {badges.map((badge, index) => {
+              const IconComponent = badgeIcons[badge] || Star;
+              return (
+                <div
+                  key={index}
+                  className="flex flex-col items-center p-4 bg-gradient-to-br from-yellow-50 to-orange-50 rounded-xl border border-yellow-200 hover:shadow-md transition-shadow duration-300"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-full flex items-center justify-center mb-2">
+                    <IconComponent className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 text-center">{badge}</span>
                 </div>
-                <span className="text-sm font-medium text-gray-700 text-center">{badge}</span>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p className="text-gray-500 text-center">No badges yet. Keep learning to earn achievements!</p>
+        )}
       </div>
 
       {/* Motivation Section */}
@@ -42,12 +56,14 @@ const BadgesAndMotivation = ({ badges }) => {
           </div>
           <h3 className="text-2xl font-bold mb-3">🚀 Keep Pushing Forward!</h3>
           <p className="text-lg text-purple-100 max-w-2xl mx-auto leading-relaxed">
-            You're making incredible progress! Every challenge you complete, every quiz you ace, and every concept you master brings you closer to your goals.
+            You're making incredible progress! Every challenge you complete, every quiz you ace,
+            and every concept you master brings you closer to your goals.
             <span className="font-semibold text-white"> Your dedication is inspiring!</span>
           </p>
         </div>
       </div>
     </div>
   );
-}
+};
+
 export default BadgesAndMotivation;

@@ -6,6 +6,8 @@ const DashboardHeader = () => {
   const { user } = useAuth();
   if (!user) return <div className="text-center py-6">Loading...</div>;
 
+
+
   const maxLevel = 10;
   const maxXP = 1000;
 

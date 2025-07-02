@@ -18,6 +18,7 @@ export const AuthProvider = ({ children }) => {
     ...user,
     id: user._id || user.id,
   };
+  
 
   setToken(token);
   setUser(normalizedUser);
