@@ -1,38 +1,69 @@
+import React from 'react';
+import { Brain, Zap, Code } from 'lucide-react';
+import { useAuth } from '../AuthContext/AuthContext';
 
+const StatsAndProgress = () => {
+  const { user } = useAuth();
 
-import { Trophy, TrendingUp, Star, Award, Zap, Target, Brain, Code, Users } from 'lucide-react';
-const StatsAndProgress = ({ userData }) => {
+  if (!user) return <div className="text-center py-6">Loading user data...</div>;
+
+  // Provide safe default values in case any field is missing
+  const quiz = user?.gameProgress?.quiz || {
+    totalPlayed: 0,
+    totalCorrect: 0,
+    highScore: 0,
+  };
+  const flashcards = user?.gameProgress?.flashcards || {
+    totalPlayed: 0,
+    totalCorrect: 0,
+  };
+  const codePuzzles = user?.gameProgress?.codePuzzles || {
+    totalCompleted: 0,
+    correctFirstTry: 0,
+  };
+
+  // Calculate accuracy percentages safely
+  const flashcardAccuracy =
+    flashcards.totalPlayed > 0
+      ? Math.round((flashcards.totalCorrect / flashcards.totalPlayed) * 100)
+      : 0;
+
+  const codePuzzleSuccessRate =
+    codePuzzles.totalCompleted > 0
+      ? Math.round((codePuzzles.correctFirstTry / codePuzzles.totalCompleted) * 100)
+      : 0;
+
   const stats = [
     {
-      title: "Quiz Performance",
+      title: 'Quiz Performance',
       icon: Brain,
-      color: "from-green-400 to-emerald-500",
+      color: 'from-green-400 to-emerald-500',
       stats: [
-        { label: "Total Played", value: userData.gameProgress.quiz.totalPlayed },
-        { label: "Correct Answers", value: userData.gameProgress.quiz.totalCorrect },
-        { label: "High Score", value: `${userData.gameProgress.quiz.highScore}%` }
-      ]
+        { label: 'Total Played', value: quiz.totalPlayed },
+        { label: 'Correct Answers', value: quiz.totalCorrect },
+        { label: 'High Score', value: `${quiz.highScore}` },
+      ],
     },
     {
-      title: "Flashcards",
+      title: 'Flashcards',
       icon: Zap,
-      color: "from-blue-400 to-cyan-500",
+      color: 'from-blue-400 to-cyan-500',
       stats: [
-        { label: "Total Played", value: userData.gameProgress.flashcards.totalPlayed },
-        { label: "Correct Answers", value: userData.gameProgress.flashcards.totalCorrect },
-        { label: "Accuracy", value: `${Math.round((userData.gameProgress.flashcards.totalCorrect / userData.gameProgress.flashcards.totalPlayed) * 100)}%` }
-      ]
+        { label: 'Total Played', value: flashcards.totalPlayed },
+        { label: 'Correct Answers', value: flashcards.totalCorrect },
+        { label: 'Accuracy', value: `${flashcardAccuracy}%` },
+      ],
     },
     {
-      title: "Code Puzzles",
+      title: 'Code Puzzles',
       icon: Code,
-      color: "from-purple-400 to-pink-500",
+      color: 'from-purple-400 to-pink-500',
       stats: [
-        { label: "Completed", value: userData.gameProgress.codePuzzles.totalCompleted },
-        { label: "First Try Success", value: userData.gameProgress.codePuzzles.correctFirstTry },
-        { label: "Success Rate", value: `${Math.round((userData.gameProgress.codePuzzles.correctFirstTry / userData.gameProgress.codePuzzles.totalCompleted) * 100)}%` }
-      ]
-    }
+        { label: 'Completed', value: codePuzzles.totalCompleted },
+        { label: 'First Try Success', value: codePuzzles.correctFirstTry },
+        { label: 'Success Rate', value: `${codePuzzleSuccessRate}%` },
+      ],
+    },
   ];
 
   return (
@@ -40,7 +71,10 @@ const StatsAndProgress = ({ userData }) => {
       {stats.map((stat, index) => {
         const IconComponent = stat.icon;
         return (
-          <div key={index} className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300">
+          <div
+            key={index}
+            className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300"
+          >
             <div className={`bg-gradient-to-r ${stat.color} p-4`}>
               <div className="flex items-center justify-between text-white">
                 <h3 className="text-lg font-bold">{stat.title}</h3>
