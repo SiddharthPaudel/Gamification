@@ -7,11 +7,18 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [user, setUser] = useState(null);
 
-  const login = (token, user) => {
+ const login = (token, user) => {
+  if (!user || typeof user !== 'object') {
+    console.error("Invalid user object during login:", user);
+    toast.error("Failed to log in. Please try again.");
+    return;
+  }
+
   const normalizedUser = {
     ...user,
     id: user._id || user.id,
   };
+
   setToken(token);
   setUser(normalizedUser);
   localStorage.setItem("token", token);
