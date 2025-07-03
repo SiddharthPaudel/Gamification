@@ -12,8 +12,8 @@ const Header = () => {
   const navigate = useNavigate();
   const profileRef = useRef();
 
-  const maxXP = 1000;
-  const maxLevel = 10;
+  const maxXP = 10000;
+  const maxLevel = 100;
 
   useEffect(() => {
     const handleClickOutside = (event) => {

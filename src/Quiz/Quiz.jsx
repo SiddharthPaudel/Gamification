@@ -399,7 +399,7 @@ const handleNextQuestion = async () => {
                     ) : (
                       <XCircle className="w-4 h-4 text-red-400" />
                     )}
-                    <span>{answer.points} XP</span>
+                    <span>{totalXP} XP</span>
                   </div>
                 </div>
               ))}

@@ -1,51 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { BookOpen, Trophy, RotateCcw, CheckCircle, XCircle, Star, Zap } from "lucide-react";
-
-// Sample modules with enhanced data
-const modules = {
-  General: {
-    icon: "🌍",
-    color: "from-blue-500 to-purple-600",
-    cards: [
-      { front: "What is the capital of Germany?", back: "Berlin" },
-      { front: "Which planet is known as the Red Planet?", back: "Mars" },
-      { front: "What is the largest mammal in the world?", back: "Blue Whale" },
-      { front: "In which year did World War II end?", back: "1945" },
-    ]
-  },
-  Web: {
-    icon: "💻",
-    color: "from-green-500 to-teal-600",
-    cards: [
-      { front: "What does CSS stand for?", back: "Cascading Style Sheets" },
-      { front: "What does HTML stand for?", back: "HyperText Markup Language" },
-      { front: "What does API stand for?", back: "Application Programming Interface" },
-      { front: "What is the default port for HTTP?", back: "80" },
-    ]
-  },
-  Math: {
-    icon: "🔢",
-    color: "from-orange-500 to-red-600",
-    cards: [
-      { front: "What is 10 / 2?", back: "5" },
-      { front: "What is the square root of 16?", back: "4" },
-      { front: "What is 7 × 8?", back: "56" },
-      { front: "What is 15% of 200?", back: "30" },
-    ]
-  },
-  Science: {
-    icon: "🔬",
-    color: "from-purple-500 to-pink-600",
-    cards: [
-      { front: "What is the chemical symbol for gold?", back: "Au" },
-      { front: "How many bones are in an adult human body?", back: "206" },
-      { front: "What gas do plants absorb from the atmosphere?", back: "Carbon Dioxide" },
-      { front: "What is the speed of light?", back: "299,792,458 m/s" },
-    ]
-  }
-};
+import axios from "axios";
+import {
+  BookOpen,
+  Trophy,
+  RotateCcw,
+  CheckCircle,
+  XCircle,
+  Star,
+  Zap
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { useAuth } from "../AuthContext/AuthContext"; // Adjust path as needed
 
 const FlashCard = () => {
+  const [modules, setModules] = useState({});
   const [selectedModule, setSelectedModule] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userAnswer, setUserAnswer] = useState("");
@@ -57,20 +25,72 @@ const FlashCard = () => {
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [animateXP, setAnimateXP] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const [attempts, setAttempts] = useState([]);
+  const [attemptSent, setAttemptSent] = useState(false);
 
-  const flashcards = selectedModule ? modules[selectedModule].cards : [];
+  const { user, updateUserProfile } = useAuth();
+
+  useEffect(() => {
+    const fetchFlashcards = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/flashcards/all");
+        const sets = res.data;
+
+        const groupedModules = {};
+        sets.forEach((set) => {
+          const moduleTitle = set.module?.title || "Untitled";
+
+          if (!groupedModules[moduleTitle]) {
+            groupedModules[moduleTitle] = {
+              icon: getModuleIcon(moduleTitle),
+              color: getModuleColor(moduleTitle),
+              cards: [],
+              setId: set._id,
+            };
+          }
+
+          groupedModules[moduleTitle].cards.push(...set.cards);
+        });
+
+        setModules(groupedModules);
+      } catch (err) {
+        console.error("Failed to fetch flashcards", err);
+      }
+    };
+
+    fetchFlashcards();
+  }, []);
+
+  const getModuleIcon = (title) => {
+    if (title.toLowerCase().includes("math")) return "🔢";
+    if (title.toLowerCase().includes("science")) return "🔬";
+    if (title.toLowerCase().includes("web")) return "💻";
+    if (title.toLowerCase().includes("general")) return "🌍";
+    return "📚";
+  };
+
+  const getModuleColor = (title) => {
+    if (title.toLowerCase().includes("math")) return "from-orange-500 to-red-600";
+    if (title.toLowerCase().includes("science")) return "from-purple-500 to-pink-600";
+    if (title.toLowerCase().includes("web")) return "from-green-500 to-teal-600";
+    if (title.toLowerCase().includes("general")) return "from-blue-500 to-purple-600";
+    return "from-blue-400 to-blue-600";
+  };
+
+  const flashcards = selectedModule ? modules[selectedModule]?.cards || [] : [];
 
   const handleFlip = () => setFlipped(!flipped);
 
   const handleSubmit = () => {
-    const isCorrect =
-      userAnswer.trim().toLowerCase() ===
-      flashcards[currentIndex].back.trim().toLowerCase();
+    if (!flashcards[currentIndex]) return;
 
+    const isCorrect = userAnswer.trim().toLowerCase() === flashcards[currentIndex].back.trim().toLowerCase();
     setAnswerFeedback(isCorrect);
-    
+
+    setAttempts(prev => [...prev, { front: flashcards[currentIndex].front, userAnswer }]);
+
     if (isCorrect) {
-      const points = 10 + (streak * 2);
+      const points = 5;  // Fixed to match backend XP (5 XP per correct)
       setXp((prev) => prev + points);
       setStreak((prev) => prev + 1);
       setCorrectAnswers((prev) => prev + 1);
@@ -85,7 +105,6 @@ const FlashCard = () => {
       setFlipped(false);
       setAnswerFeedback(null);
       setShowHint(false);
-
       if (currentIndex + 1 < flashcards.length) {
         setCurrentIndex(currentIndex + 1);
       } else {
@@ -93,6 +112,41 @@ const FlashCard = () => {
       }
     }, 1500);
   };
+
+  useEffect(() => {
+    if (showResult && selectedModule && attempts.length > 0 && !attemptSent) {
+      const sendAttemptData = async () => {
+        try {
+          const setId = modules[selectedModule].setId;
+          const response = await axios.post(
+            `http://localhost:5000/api/flashcards/attempt/${user.id}/${setId}`,
+            { attempts }
+          );
+
+          const data = response.data;
+
+          updateUserProfile({
+            ...user,
+            xp: (user.xp || 0) + data.xpEarned,
+            level: data.newLevel,
+            badges: data.badges,
+            gameProgress: {
+              ...user.gameProgress,
+              flashcards: data.gameProgress,
+            },
+          });
+
+          toast.success("XP and badges updated!");
+          setAttemptSent(true);
+        } catch (error) {
+          console.error("Failed to send flashcard attempts:", error);
+          toast.error("Failed to update XP and badges.");
+        }
+      };
+
+      sendAttemptData();
+    }
+  }, [showResult, selectedModule, attempts, modules, updateUserProfile, user, attemptSent]);
 
   const handleRestart = () => {
     setCurrentIndex(0);
@@ -105,6 +159,8 @@ const FlashCard = () => {
     setSelectedModule(null);
     setAnswerFeedback(null);
     setShowHint(false);
+    setAttempts([]);
+    setAttemptSent(false);
   };
 
   const handleSkip = () => {
@@ -112,7 +168,8 @@ const FlashCard = () => {
     setUserAnswer("");
     setFlipped(false);
     setShowHint(false);
-    
+    setAttempts(prev => [...prev, { front: flashcards[currentIndex]?.front, userAnswer: "" }]);
+
     if (currentIndex + 1 < flashcards.length) {
       setCurrentIndex(currentIndex + 1);
     } else {
@@ -141,7 +198,6 @@ const FlashCard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 flex flex-col items-center px-4 py-8">
-      {/* Header Stats */}
       {selectedModule && !showResult && (
         <div className="w-full max-w-4xl mb-6">
           <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 text-white">
@@ -182,7 +238,6 @@ const FlashCard = () => {
             </h1>
             <p className="text-xl text-white/80">Choose your learning adventure</p>
           </div>
-          
           <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(modules).map(([mod, data]) => (
               <div
@@ -237,43 +292,37 @@ const FlashCard = () => {
         <div className="w-full max-w-2xl">
           <div className="text-center mb-8">
             <h2 className="text-2xl font-semibold text-white mb-2 flex items-center justify-center gap-2">
-              <span className="text-3xl">{modules[selectedModule].icon}</span>
+              <span className="text-3xl">{modules[selectedModule]?.icon}</span>
               {selectedModule} Module
             </h2>
           </div>
 
-          {/* Flashcard */}
           <div className="mb-8 perspective-1000">
             <div
-              className={`relative w-full h-80 cursor-pointer transform-style-preserve-3d transition-transform duration-700 ${
-                flipped ? 'rotate-y-180' : ''
-              } hover:scale-105 transition-all`}
+              className={`relative w-full h-80 cursor-pointer transform-style-preserve-3d transition-transform duration-700 ${flipped ? 'rotate-y-180' : ''} hover:scale-105 transition-all`}
               onClick={handleFlip}
             >
-              {/* Front */}
               <div className="absolute w-full h-full bg-white rounded-3xl shadow-2xl flex items-center justify-center text-center px-8 py-6 backface-hidden border-4 border-white/20">
                 <div>
                   <BookOpen className="w-12 h-12 text-indigo-600 mx-auto mb-4" />
                   <p className="text-gray-800 text-xl font-medium leading-relaxed">
-                    {current.front}
+                    {current?.front}
                   </p>
                   <p className="text-gray-400 text-sm mt-4">Click to reveal answer</p>
                 </div>
               </div>
 
-              {/* Back */}
-              <div className={`absolute w-full h-full rotate-y-180 bg-gradient-to-br ${modules[selectedModule].color} text-white rounded-3xl shadow-2xl flex items-center justify-center text-center px-8 py-6 backface-hidden border-4 border-white/20`}>
+              <div className={`absolute w-full h-full rotate-y-180 bg-gradient-to-br ${modules[selectedModule]?.color} text-white rounded-3xl shadow-2xl flex items-center justify-center text-center px-8 py-6 backface-hidden border-4 border-white/20`}>
                 <div>
                   <CheckCircle className="w-12 h-12 text-white mx-auto mb-4" />
                   <p className="text-2xl font-bold leading-relaxed">
-                    {current.back}
+                    {current?.back}
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Answer Section */}
           <div className="bg-white/10 backdrop-blur-md p-8 rounded-3xl shadow-2xl border border-white/20">
             {answerFeedback !== null ? (
               <div className={`text-center py-8 ${answerFeedback ? 'text-green-400' : 'text-red-400'}`}>
@@ -281,13 +330,13 @@ const FlashCard = () => {
                   <>
                     <CheckCircle className="w-16 h-16 mx-auto mb-4 animate-bounce" />
                     <p className="text-2xl font-bold">Correct! 🎉</p>
-                    <p className="text-lg">+{10 + (streak * 2)} XP</p>
+                    <p className="text-lg">+5 XP</p> {/* Fixed XP display */}
                   </>
                 ) : (
                   <>
                     <XCircle className="w-16 h-16 mx-auto mb-4" />
                     <p className="text-2xl font-bold">Not quite right</p>
-                    <p className="text-lg text-white/70">The answer was: {current.back}</p>
+                    <p className="text-lg text-white/70">The answer was: {current?.back}</p>
                   </>
                 )}
               </div>
@@ -326,7 +375,7 @@ const FlashCard = () => {
                   </div>
                   {showHint && (
                     <div className="bg-yellow-500/20 border border-yellow-500/30 rounded-2xl p-4 text-yellow-200 animate-fadeIn">
-                      <p className="text-sm">💡 First letter: <span className="font-bold">{current.back.charAt(0)}</span></p>
+                      <p className="text-sm">💡 First letter: <span className="font-bold">{current?.back.charAt(0)}</span></p>
                     </div>
                   )}
                   <p className="text-center text-white/60 text-sm">Press Enter to submit</p>
