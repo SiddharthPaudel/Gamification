@@ -1,96 +1,140 @@
-import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 
-const AddFlashCard = () => {
-  const [quizzes, setQuizzes] = useState([
-    { id: 1, title: "React Basics Quiz", questions: 10, attempts: 234, module: "React Fundamentals" },
-    { id: 2, title: "JavaScript Functions", questions: 15, attempts: 187, module: "JavaScript Basics" },
-    { id: 3, title: "CSS Flexbox", questions: 8, attempts: 156, module: "CSS Styling" },
-    { id: 4, title: "Node.js Fundamentals", questions: 12, attempts: 89, module: "Node.js Backend" },
-    { id: 5, title: "Advanced React Hooks", questions: 20, attempts: 145, module: "React Fundamentals" },
-    { id: 6, title: "JavaScript ES6", questions: 18, attempts: 203, module: "JavaScript Basics" }
-  ]);
+const CreateFlashcardSet = () => {
+  const [modules, setModules] = useState([]);
+  const [selectedModuleId, setSelectedModuleId] = useState("");
+  const [cards, setCards] = useState([{ front: "", back: "" }]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleCreateQuiz = () => {
-    console.log('Create new quiz');
-    alert('Create new quiz functionality');
+  // Fetch modules on component mount
+  useEffect(() => {
+    const fetchModules = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/modules/get-all-module");
+        const fetchedModules = res.data.modules || res.data || [];
+        setModules(fetchedModules);
+      } catch (error) {
+        console.error("Failed to fetch modules:", error);
+        toast.error("Failed to load modules");
+      }
+    };
+
+    fetchModules();
+  }, []);
+
+  // Handle input changes
+  const handleCardChange = (index, field, value) => {
+    const updatedCards = [...cards];
+    updatedCards[index][field] = value;
+    setCards(updatedCards);
   };
 
-  const handleEditQuiz = (quizId) => {
-    console.log('Edit quiz:', quizId);
-    alert(`Edit quiz with ID: ${quizId}`);
+  // Add a new card
+  const addCard = () => {
+    setCards([...cards, { front: "", back: "" }]);
   };
 
-  const handleViewQuiz = (quizId) => {
-    console.log('View quiz:', quizId);
-    alert(`View quiz with ID: ${quizId}`);
+  // Remove a card
+  const removeCard = (index) => {
+    const updatedCards = cards.filter((_, i) => i !== index);
+    setCards(updatedCards);
   };
 
-  const handleDeleteQuiz = (quizId) => {
-    if (window.confirm('Are you sure you want to delete this quiz?')) {
-      setQuizzes(quizzes.filter(quiz => quiz.id !== quizId));
+  // Submit form
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedModuleId) return toast.error("Please select a module");
+
+    try {
+      setIsSubmitting(true);
+      await axios.post(`http://localhost:5000/api/flashcards/${selectedModuleId}`, {
+        cards
+      });
+
+      toast.success("Flashcard set created!");
+      setCards([{ front: "", back: "" }]);
+    } catch (error) {
+      console.error("Error creating flashcard set:", error);
+      toast.error("Failed to create flashcard set");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold">Quiz Management</h2>
-        <button 
-          onClick={handleCreateQuiz}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center"
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          Create Quiz
-        </button>
-      </div>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {quizzes.map((quiz) => (
-          <div key={quiz.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-            <h3 className="font-semibold text-lg mb-2">{quiz.title}</h3>
-            <p className="text-sm text-gray-600 mb-3">{quiz.module}</p>
-            <div className="flex justify-between text-sm mb-4">
-              <span>{quiz.questions} Questions</span>
-              <span>{quiz.attempts} Attempts</span>
-            </div>
-            <div className="flex space-x-2">
-              <button 
-                onClick={() => handleEditQuiz(quiz.id)}
-                className="flex-1 bg-blue-100 text-blue-700 py-2 px-3 rounded hover:bg-blue-200 transition-colors"
-              >
-                Edit
-              </button>
-              <button 
-                onClick={() => handleViewQuiz(quiz.id)}
-                className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded hover:bg-gray-200 transition-colors"
-              >
-                View
-              </button>
-              <button 
-                onClick={() => handleDeleteQuiz(quiz.id)}
-                className="px-3 py-2 bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
-              >
-                Delete
-              </button>
+    <div className="max-w-3xl mx-auto p-4 bg-white shadow rounded-xl mt-6">
+      <h2 className="text-xl font-bold mb-4">Create Flashcard Set</h2>
+
+      {/* Module Dropdown */}
+      <select
+        className="w-full p-2 border rounded mb-4"
+        value={selectedModuleId}
+        onChange={(e) => setSelectedModuleId(e.target.value)}
+        required
+      >
+        <option value="">Select a Module</option>
+        {modules.map((mod) => (
+          <option key={mod._id} value={mod._id}>
+            {mod.title}
+          </option>
+        ))}
+      </select>
+
+      {/* Flashcard Form */}
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {cards.map((card, index) => (
+          <div key={index} className="border p-4 rounded-md space-y-2 bg-gray-50">
+            <input
+              type="text"
+              placeholder="Front"
+              value={card.front}
+              onChange={(e) => handleCardChange(index, "front", e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+            <input
+              type="text"
+              placeholder="Back"
+              value={card.back}
+              onChange={(e) => handleCardChange(index, "back", e.target.value)}
+              className="w-full p-2 border rounded"
+              required
+            />
+            <div className="text-right">
+              {cards.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeCard(index)}
+                  className="text-red-600 hover:underline text-sm"
+                >
+                  Remove
+                </button>
+              )}
             </div>
           </div>
         ))}
-      </div>
-      
-      {quizzes.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">No quizzes available</p>
-          <button 
-            onClick={handleCreateQuiz}
-            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+
+        <div className="flex justify-between">
+          <button
+            type="button"
+            onClick={addCard}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
           >
-            Create Your First Quiz
+            + Add Card
+          </button>
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="px-6 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+          >
+            {isSubmitting ? "Creating..." : "Create Flashcard Set"}
           </button>
         </div>
-      )}
+      </form>
     </div>
   );
 };
 
-export default AddFlashCard;
+export default CreateFlashcardSet;
