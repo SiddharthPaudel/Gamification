@@ -42,7 +42,7 @@ const Header = () => {
         <nav className="hidden md:flex items-center space-x-6 text-gray-700 font-medium">
           <Link to="/" className="hover:text-indigo-600 transition">Home</Link>
           <Link to="/modules" className="hover:text-indigo-600 transition">Modules</Link>
-          <Link to="/games/puzzle" className="hover:text-indigo-600 transition">Puzzle</Link>
+          <Link to="/games/Word" className="hover:text-indigo-600 transition">Find Words</Link>
           <Link to="/games/quiz" className="hover:text-indigo-600 transition">Quiz</Link>
           <Link to="/games/flashcard" className="hover:text-indigo-600 transition">Flashcard</Link>
           <Link to="/leaderboard" className="hover:text-indigo-600 transition">Leaderboard</Link>

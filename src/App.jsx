@@ -21,6 +21,7 @@ import AddFlashCard from "./Admin/AddFlashCard/AddFlashCard.jsx";
 import UserTable from "./Admin/UserTable/UserTable.jsx";
 import AddLesson from "./Admin/AddLesson/AddLesson.jsx";
 import AddQuiz from "./Admin/AddQuiz/AddQuiz.jsx";
+import WordSearchGame from "./WordSearch/WordSearchGame.jsx";
 // Example admin page
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/leaderboard" element={<Leaderboard />} />
           <Route path="/games/puzzle" element={<Puzzle />} />
+          <Route path="/games/Word" element={<WordSearchGame/>} />
           <Route path="/games/quiz" element={<Quiz />} />
           <Route path="/games/flashcard" element={<Flashcard />} />
           <Route path="/login" element={<Login />} />
