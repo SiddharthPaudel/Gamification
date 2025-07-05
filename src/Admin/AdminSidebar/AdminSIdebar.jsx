@@ -6,7 +6,8 @@ import {
   GraduationCap, 
   Users, 
   HelpCircle, 
-  CreditCard
+  CreditCard,
+  Puzzle
 } from 'lucide-react';
 
 const AdminSidebar = () => {
@@ -19,6 +20,7 @@ const AdminSidebar = () => {
     { id: 'users', label: 'Users', icon: Users, path: '/admin/users' },
     { id: 'quiz', label: 'Quiz', icon: HelpCircle, path: '/admin/quiz' },
     { id: 'flashcard', label: 'Flashcard', icon: CreditCard, path: '/admin/flashcard' },
+    { id: 'wordfinder', label: 'WordFinder', icon: Puzzle, path: '/admin/WordFinder' },
   ];
 
   return (

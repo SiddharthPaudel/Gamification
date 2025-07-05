@@ -155,7 +155,7 @@ const Header = () => {
         <div className="md:hidden bg-white px-4 pb-4 text-sm space-y-2">
           <Link to="/" className="block py-2">Home</Link>
           <Link to="/modules" className="block py-2">Modules</Link>
-          <Link to="/games/puzzle" className="block py-2">Puzzle</Link>
+       <Link to="/games/Word" className="block py-2">Find Words</Link>
           <Link to="/games/quiz" className="block py-2">Quiz</Link>
           <Link to="/games/flashcard" className="block py-2">Flashcard</Link>
           <Link to="/leaderboard" className="block py-2">Leaderboard</Link>
