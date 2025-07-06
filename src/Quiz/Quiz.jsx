@@ -14,7 +14,7 @@ import {
   Zap,
 } from "lucide-react";
 import toast from "react-hot-toast";
-
+import OwlMascot from "../OwlMascot/OwlMascot"; // adjust the path
 const getDifficultyColor = (difficulty) => {
   switch (difficulty) {
     case "Easy":
@@ -278,6 +278,12 @@ const handleNextQuestion = async () => {
   if (!activeModule) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 px-4 py-8">
+ <OwlMascot 
+  message="Welcome to Quiz " 
+  position="absolute"
+  positionProps={{ top: 100, left: 30 }}
+/>
+
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h1 className="text-6xl font-bold mb-4 bg-gradient-to-r from-yellow-400 to-pink-400 bg-clip-text text-transparent">
@@ -286,6 +292,7 @@ const handleNextQuestion = async () => {
             <p className="text-xl text-white/80 mb-2">
               Challenge your knowledge and earn XP!
             </p>
+         
             <div className="flex justify-center items-center gap-4 text-white/60">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5" />
@@ -598,6 +605,7 @@ const handleNextQuestion = async () => {
             )}
           </div>
         </div>
+         <OwlMascot message="Keep going, you're doing great! 🦉" />
       </div>
 {/* 
       <style jsx>{`

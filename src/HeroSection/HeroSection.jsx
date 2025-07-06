@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Play, Sparkles, ArrowRight, Brain, Puzzle, CreditCard } from "lucide-react";
-
+import OwlMascot from "../OwlMascot/OwlMascot"; // adjust the path
 const games = [
   {
     title: "Quiz",
@@ -40,6 +40,11 @@ const HeroSection = () => {
   return (
     <section className="relative min-h-[90vh] flex items-center bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden">
       {/* Glowing Circles */}
+       <OwlMascot 
+        // message="Welcome to Quiz " 
+        position="absolute"
+        positionProps={{ top: 95, left: 30 }}
+      />
       <div className="absolute top-0 -left-40 w-80 h-80 bg-pink-500/20 blur-3xl rounded-full animate-pulse" />
       <div className="absolute bottom-0 -right-40 w-80 h-80 bg-purple-500/20 blur-3xl rounded-full animate-pulse delay-1000" />
 
