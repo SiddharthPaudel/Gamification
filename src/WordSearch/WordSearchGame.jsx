@@ -3,6 +3,7 @@ import axios from "axios";
 import { useAuth } from "../AuthContext/AuthContext";
 import toast from "react-hot-toast";
 import { Search, RefreshCw, Trophy, Eye, EyeOff } from "lucide-react";
+import OwlMascot from "../OwlMascot/OwlMascot.jsx"; // adjust path if needed
 
 const formatTime = (seconds) => {
   const m = Math.floor(seconds / 60);
@@ -26,6 +27,13 @@ const WordSearchGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [attemptSubmitted, setAttemptSubmitted] = useState(false);
   const [showWords, setShowWords] = useState(true);
+const quotes = [
+  "Keep going, you're doing awesome! 🦉",
+  "Just one more word to go!",
+  "You're a puzzle master!",
+  "Great job! Keep it up!",
+  "Time is ticking ⏰, but you’re shining!",
+];
 
   const fetchDailyPuzzle = useCallback(async () => {
     try {
@@ -153,119 +161,125 @@ const WordSearchGame = () => {
   }, [foundWords, words.length, attemptSubmitted, gameStarted]);
 
   return (
-    <div className="min-h-screen p-6 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Right Side: Words */}
-        <div className="col-span-1 space-y-6">
-          <h1 className="text-3xl font-bold flex items-center gap-3">
-            <Search className="w-6 h-6" /> Word Puzzle
-          </h1>
+    <>
+      <div className="min-h-screen p-6 bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 text-white">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Right Side: Words */}
+          <div className="col-span-1 space-y-6">
+            <h1 className="text-3xl font-bold flex items-center gap-3">
+              <Search className="w-6 h-6" /> Word Puzzle
+            </h1>
 
-          <button
-            onClick={() => setShowWords(!showWords)}
-            className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded"
-          >
-            {showWords ? <EyeOff /> : <Eye />}
-            {showWords ? "Hide Words" : "Show Words"}
-          </button>
-
-          {showWords && (
-            <div>
-              <h2 className="text-xl font-bold mb-2">Words to Find</h2>
-              <ul className="grid grid-cols-1 gap-2">
-                {words.map(({ word }) => (
-                  <li
-                    key={word}
-                    className={`px-3 py-1 rounded text-center ${
-                      foundWords.has(word)
-                        ? "bg-green-600 line-through"
-                        : "bg-white/20"
-                    }`}
-                  >
-                    {word}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-
-          {attemptSubmitted && (
-            <div className="bg-green-700 p-4 rounded text-center mt-4">
-              <Trophy className="mx-auto text-yellow-300 w-8 h-8" />
-              <p className="font-bold text-lg mt-2">XP Earned: +{xpEarned}</p>
-            </div>
-          )}
-        </div>
-
-        {/* Left Side: Puzzle Grid */}
-        <div className="col-span-3">
-          <div className="mb-4 flex gap-6 flex-wrap items-center">
-            <div>
-              Time: <strong>{formatTime(timeElapsed)}</strong>
-            </div>
-            <div>
-              Found: <strong>{foundWords.size}</strong> / {words.length}
-            </div>
             <button
-              onClick={fetchDailyPuzzle}
-              className="flex items-center gap-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded"
+              onClick={() => setShowWords(!showWords)}
+              className="flex items-center gap-2 bg-yellow-500 hover:bg-yellow-600 px-4 py-2 rounded"
             >
-              <RefreshCw /> New Puzzle
+              {showWords ? <EyeOff /> : <Eye />}
+              {showWords ? "Hide Words" : "Show Words"}
             </button>
-          </div>
 
-          <div
-            className="grid gap-1 w-fit mx-auto select-none"
-            style={{ gridTemplateColumns: `repeat(${grid.length || 0}, 1fr)` }}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-          >
-            {grid.map((row, rIdx) =>
-              row.map((char, cIdx) => {
-                const cellKey = `${rIdx}-${cIdx}`;
-                const isSelected = selectedCells.includes(cellKey);
-                const isFound = words.some(
-                  (w) => foundWords.has(w.word) && w.cells.includes(cellKey)
-                );
-                return (
-                  <div
-                    key={cellKey}
-                    onMouseDown={() => handleMouseDown(rIdx, cIdx)}
-                    onMouseEnter={() => handleMouseEnter(rIdx, cIdx)}
-                    className={`w-10 h-10 flex items-center justify-center border-2 cursor-pointer
-                      ${
-                        isSelected
-                          ? "bg-yellow-400 text-black border-yellow-600 scale-110"
-                          : isFound
-                          ? "bg-green-400 text-black border-green-600"
-                          : "bg-white/20 border-white/30 text-white hover:bg-white/30"
+            {showWords && (
+              <div>
+                <h2 className="text-xl font-bold mb-2">Words to Find</h2>
+                <ul className="grid grid-cols-1 gap-2">
+                  {words.map(({ word }) => (
+                    <li
+                      key={word}
+                      className={`px-3 py-1 rounded text-center ${
+                        foundWords.has(word)
+                          ? "bg-green-600 line-through"
+                          : "bg-white/20"
                       }`}
-                  >
-                    {char}
-                  </div>
-                );
-              })
+                    >
+                      {word}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {attemptSubmitted && (
+              <div className="bg-green-700 p-4 rounded text-center mt-4">
+                <Trophy className="mx-auto text-yellow-300 w-8 h-8" />
+                <p className="font-bold text-lg mt-2">XP Earned: +{xpEarned}</p>
+              </div>
             )}
           </div>
 
-          {attemptSubmitted && (
-            <div className="mt-10 text-center bg-green-600 bg-opacity-60 p-6 rounded-lg">
-              <Trophy className="mx-auto w-14 h-14 mb-4 text-yellow-400 animate-bounce" />
-              <h3 className="text-3xl font-bold mb-2">Congratulations!</h3>
-              <p>You found all words!</p>
-              <p>XP Earned: +{xpEarned}</p>
-              <p>Time Taken: {formatTime(timeElapsed)}</p>
+          {/* Left Side: Puzzle Grid */}
+          <div className="col-span-3">
+            <div className="mb-4 flex gap-6 flex-wrap items-center">
+              <div>
+                Time: <strong>{formatTime(timeElapsed)}</strong>
+              </div>
+              <div>
+                Found: <strong>{foundWords.size}</strong> / {words.length}
+              </div>
               <button
                 onClick={fetchDailyPuzzle}
-                className="mt-4 bg-white text-green-700 font-bold px-6 py-3 rounded hover:bg-gray-100"
+                className="flex items-center gap-2 bg-green-500 hover:bg-green-600 px-4 py-2 rounded"
               >
-                Play Again
+                <RefreshCw /> New Puzzle
               </button>
             </div>
-          )}
+
+            <div
+              className="grid gap-1 w-fit mx-auto select-none"
+              style={{ gridTemplateColumns: `repeat(${grid.length || 0}, 1fr)` }}
+              onMouseUp={handleMouseUp}
+              onMouseLeave={handleMouseUp}
+            >
+              {grid.map((row, rIdx) =>
+                row.map((char, cIdx) => {
+                  const cellKey = `${rIdx}-${cIdx}`;
+                  const isSelected = selectedCells.includes(cellKey);
+                  const isFound = words.some(
+                    (w) => foundWords.has(w.word) && w.cells.includes(cellKey)
+                  );
+                  return (
+                    <div
+                      key={cellKey}
+                      onMouseDown={() => handleMouseDown(rIdx, cIdx)}
+                      onMouseEnter={() => handleMouseEnter(rIdx, cIdx)}
+                      className={`w-10 h-10 flex items-center justify-center border-2 cursor-pointer
+                        ${
+                          isSelected
+                            ? "bg-yellow-400 text-black border-yellow-600 scale-110"
+                            : isFound
+                            ? "bg-green-400 text-black border-green-600"
+                            : "bg-white/20 border-white/30 text-white hover:bg-white/30"
+                        }`}
+                    >
+                      {char}
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {attemptSubmitted && (
+              <div className="mt-10 text-center bg-green-600 bg-opacity-60 p-6 rounded-lg">
+                <Trophy className="mx-auto w-14 h-14 mb-4 text-yellow-400 animate-bounce" />
+                <h3 className="text-3xl font-bold mb-2">Congratulations!</h3>
+                <p>You found all words!</p>
+                <p>XP Earned: +{xpEarned}</p>
+                <p>Time Taken: {formatTime(timeElapsed)}</p>
+                <button
+                  onClick={fetchDailyPuzzle}
+                  className="mt-4 bg-white text-green-700 font-bold px-6 py-3 rounded hover:bg-gray-100"
+                >
+                  Play Again
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Floating Owl Mascot */}
+   <OwlMascot message={quotes[Math.floor(Math.random() * quotes.length)]} />
+
+    </>
   );
 };
 
