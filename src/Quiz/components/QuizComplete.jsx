@@ -1,53 +1,70 @@
 import React from 'react';
-import { Trophy, CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
+import { CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
+import OwlMascot from '../../OwlMascot/OwlMascot'; // Adjust path if needed
 
 const QuizComplete = ({ totalXP, answers, onBack, getAccuracy }) => {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 px-4 py-8 flex items-center justify-center">
-      <div className="bg-white/10 backdrop-blur-md rounded-3xl p-12 shadow-2xl border border-white/20 max-w-2xl w-full text-center">
-        <Trophy className="w-24 h-24 text-yellow-400 mx-auto mb-6 animate-bounce" />
-        <h2 className="text-4xl font-bold text-white mb-6">Quiz Complete! 🎉</h2>
+    <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 px-6 py-12 flex flex-col items-center justify-center relative">
+      
+      {/* Mascot Container */}
+      <div className="w-36 h-36 drop-shadow-xl animate-bounce mb-4">
+        <OwlMascot 
+          isInCongrats 
+          size={120} 
+          showMessage={true} 
+          message="You Did It! 🎉🦉"
+          position="relative"
+        />
+      </div>
 
-        <div className="grid grid-cols-2 gap-8 mb-8 text-white">
-          <div className="text-center">
-            <div className="text-4xl font-bold text-yellow-400">{totalXP}</div>
-            <div className="text-sm opacity-75">Total XP</div>
-          </div>
-          <div className="text-center">
-            <div className="text-4xl font-bold text-green-400">{getAccuracy()}%</div>
-            <div className="text-sm opacity-75">Accuracy</div>
-          </div>
+      {/* Heading */}
+      <h2 className="text-4xl font-extrabold text-white mb-4 text-center tracking-wide drop-shadow-md leading-tight">
+        Quiz Complete!
+      </h2>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-10 mb-8 text-white max-w-md w-full">
+        <div className="text-center">
+          <div className="text-4xl font-bold text-yellow-400 drop-shadow-lg">{totalXP}</div>
+          <div className="text-sm opacity-80 uppercase tracking-wider">Total XP</div>
         </div>
-
-        <div className="bg-white/5 rounded-2xl p-6 mb-8">
-          <h3 className="text-white font-semibold mb-4">Performance Breakdown</h3>
-          <div className="space-y-3 text-sm text-white/80">
-            {answers.map((answer, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span>Question {index + 1}</span>
-                <div className="flex items-center gap-2">
-                  {answer.isCorrect ? (
-                    <CheckCircle className="w-4 h-4 text-green-400" />
-                  ) : (
-                    <XCircle className="w-4 h-4 text-red-400" />
-                  )}
-                  <span>{totalXP} XP</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="flex gap-4 justify-center">
-          <button
-            onClick={onBack}
-            className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-2xl hover:from-purple-700 hover:to-pink-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Choose New Quiz
-          </button>
+        <div className="text-center">
+          <div className="text-4xl font-bold text-green-400 drop-shadow-lg">{getAccuracy()}%</div>
+          <div className="text-sm opacity-80 uppercase tracking-wider">Accuracy</div>
         </div>
       </div>
+
+      {/* Performance Breakdown */}
+      <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 mb-10 max-w-md w-full shadow-lg border border-white/20">
+        <h3 className="text-white font-semibold mb-5 text-center text-lg tracking-wide">
+          Performance Breakdown
+        </h3>
+        <div className="space-y-4 text-sm text-white/90">
+          {answers.map((answer, index) => (
+            <div key={index} className="flex justify-between items-center border-b border-white/20 pb-2 last:border-none">
+              <span className="font-medium">Question {index + 1}</span>
+              <div className="flex items-center gap-3">
+                {answer.isCorrect ? (
+                  <CheckCircle className="w-5 h-5 text-green-400 drop-shadow-md" />
+                ) : (
+                  <XCircle className="w-5 h-5 text-red-400 drop-shadow-md" />
+                )}
+                <span className="font-semibold">{totalXP} XP</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Back Button */}
+      <button
+        onClick={onBack}
+        className="flex items-center gap-3 px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-3xl font-semibold shadow-lg hover:from-purple-700 hover:to-pink-700 transition-transform duration-300 hover:scale-105 focus:outline-none focus:ring-4 focus:ring-purple-500"
+        aria-label="Choose New Quiz"
+      >
+        <ArrowLeft className="w-6 h-6" />
+        Choose New Quiz
+      </button>
     </div>
   );
 };

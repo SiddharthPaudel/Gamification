@@ -139,14 +139,14 @@ const Quiz = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 px-4 py-8">
-      {/* <QuizTimer
+      <QuizTimer
         timeLeft={timeLeft}
         setTimeLeft={setTimeLeft}
         activeModule={activeModule}
         quizCompleted={quizCompleted}
         showResult={showResult}
         onTimeUp={handleTimeUp}
-      /> */}
+      />
       
       <div className="max-w-4xl mx-auto">
         <QuizHeader

@@ -4,6 +4,7 @@ import { useAuth } from "../AuthContext/AuthContext";
 import toast from "react-hot-toast";
 import { Search, RefreshCw, Trophy, Eye, EyeOff } from "lucide-react";
 import OwlMascot from "../OwlMascot/OwlMascot.jsx"; // adjust path if needed
+import CongratulationModal from "./CongratulationModal.jsx"; // adjust path if needed
 
 const formatTime = (seconds) => {
   const m = Math.floor(seconds / 60);
@@ -27,13 +28,15 @@ const WordSearchGame = () => {
   const [gameStarted, setGameStarted] = useState(false);
   const [attemptSubmitted, setAttemptSubmitted] = useState(false);
   const [showWords, setShowWords] = useState(true);
-const quotes = [
-  "Keep going, you're doing awesome! 🦉",
-  "Just one more word to go!",
-  "You're a puzzle master!",
-  "Great job! Keep it up!",
-  "Time is ticking ⏰, but you’re shining!",
-];
+  const [showCongratsModal, setShowCongratsModal] = useState(false);
+
+  const quotes = [
+    "Keep going, you're doing awesome! 🦉",
+    "Just one more word to go!",
+    "You're a puzzle master!",
+    "Great job! Keep it up!",
+    "Time is ticking ⏰, but you're shining!",
+  ];
 
   const fetchDailyPuzzle = useCallback(async () => {
     try {
@@ -46,6 +49,7 @@ const quotes = [
       setGameStarted(true);
       setAttemptSubmitted(false);
       setXpEarned(0);
+      setShowCongratsModal(false);
     } catch (error) {
       toast.error("Failed to load daily puzzle.");
     }
@@ -145,6 +149,7 @@ const quotes = [
       updateUserProfile(updatedUser);
       toast.success(`🎉 Puzzle Complete! XP +${data.xpEarned}, Level ${data.newLevel}`);
       setAttemptSubmitted(true);
+      setShowCongratsModal(true);
     } catch (error) {
       toast.error("Failed to submit puzzle attempt.");
     }
@@ -159,6 +164,15 @@ const quotes = [
       submitAttempt();
     }
   }, [foundWords, words.length, attemptSubmitted, gameStarted]);
+
+  const handlePlayAgain = () => {
+    setShowCongratsModal(false);
+    fetchDailyPuzzle();
+  };
+
+  const handleCloseModal = () => {
+    setShowCongratsModal(false);
+  };
 
   return (
     <>
@@ -256,29 +270,21 @@ const quotes = [
                 })
               )}
             </div>
-
-            {attemptSubmitted && (
-              <div className="mt-10 text-center bg-green-600 bg-opacity-60 p-6 rounded-lg">
-                <Trophy className="mx-auto w-14 h-14 mb-4 text-yellow-400 animate-bounce" />
-                <h3 className="text-3xl font-bold mb-2">Congratulations!</h3>
-                <p>You found all words!</p>
-                <p>XP Earned: +{xpEarned}</p>
-                <p>Time Taken: {formatTime(timeElapsed)}</p>
-                <button
-                  onClick={fetchDailyPuzzle}
-                  className="mt-4 bg-white text-green-700 font-bold px-6 py-3 rounded hover:bg-gray-100"
-                >
-                  Play Again
-                </button>
-              </div>
-            )}
           </div>
         </div>
       </div>
 
       {/* Floating Owl Mascot */}
-   <OwlMascot message={quotes[Math.floor(Math.random() * quotes.length)]} />
+      <OwlMascot message={quotes[Math.floor(Math.random() * quotes.length)]} />
 
+      {/* Congratulations Modal */}
+      <CongratulationModal
+        isVisible={showCongratsModal}
+        xpEarned={xpEarned}
+        timeElapsed={timeElapsed}
+        onPlayAgain={handlePlayAgain}
+        onClose={handleCloseModal}
+      />
     </>
   );
 };
