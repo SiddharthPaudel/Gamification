@@ -23,6 +23,7 @@ import AddLesson from "./Admin/AddLesson/AddLesson.jsx";
 import AddQuiz from "./Admin/AddQuiz/AddQuiz.jsx";
 import WordSearchGame from "./WordSearch/WordSearchGame.jsx";
 import AddDailyWordFinder from "./Admin/AddWordFInder/AddDailyWordFInder.jsx";
+import QuizTable from "./Admin/QuizTable/QuizTable.jsx";
 // Example admin page
 
 function App() {
@@ -54,6 +55,7 @@ function App() {
           <Route path="/admin/quiz" element={<AddQuiz />} />
           <Route path="/admin/flashcard" element={<AddFlashCard />} />
           <Route path="/admin/WordFinder" element={<AddDailyWordFinder />} />
+          <Route path="/admin/QuizTable" element={<QuizTable/>}/> 
         </Route>
       </Routes>
     </Router>
