@@ -19,8 +19,9 @@ const AdminSidebar = () => {
     { id: 'add-lesson', label: 'Add Lesson', icon: GraduationCap, path: '/admin/add-lesson' },
     { id: 'users', label: 'Users', icon: Users, path: '/admin/users' },
     { id: 'quiz', label: 'Quiz', icon: HelpCircle, path: '/admin/quiz' },
+    { id: 'flashcard', label: 'Flashcard', icon: CreditCard, path: '/admin/flashcard' },
     { id: 'wordfinder', label: 'WordFinder', icon: Puzzle, path: '/admin/WordFinder' },
-    { id: 'quiztable', label: 'QuizTable', icon: HelpCircle, path: '/admin/quiz' },
+    { id: 'quiztable', label: 'QuizTable', icon: HelpCircle, path: '/admin/quiztable' },
   ];
 
   return (

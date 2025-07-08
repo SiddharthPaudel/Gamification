@@ -55,7 +55,7 @@ function App() {
           <Route path="/admin/quiz" element={<AddQuiz />} />
           <Route path="/admin/flashcard" element={<AddFlashCard />} />
           <Route path="/admin/WordFinder" element={<AddDailyWordFinder />} />
-          <Route path="/admin/QuizTable" element={<QuizTable/>}/> 
+          <Route path="/admin/quiztable" element={<QuizTable/>}/> 
         </Route>
       </Routes>
     </Router>
