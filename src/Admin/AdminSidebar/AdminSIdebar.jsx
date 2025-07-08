@@ -22,6 +22,7 @@ const AdminSidebar = () => {
     { id: 'flashcard', label: 'Flashcard', icon: CreditCard, path: '/admin/flashcard' },
     { id: 'wordfinder', label: 'WordFinder', icon: Puzzle, path: '/admin/WordFinder' },
     { id: 'quiztable', label: 'QuizTable', icon: HelpCircle, path: '/admin/quiztable' },
+    { id: 'flashcard', label: 'Flashcard', icon: CreditCard, path: '/admin/flashcardtable' },
   ];
 
   return (

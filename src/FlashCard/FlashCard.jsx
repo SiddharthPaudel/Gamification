@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import stringSimilarity from "string-similarity"; // Added for fuzzy matching
 import {
   BookOpen,
   Trophy,
@@ -15,7 +16,7 @@ import {
   ArrowLeft,
   Brain,
   Clock,
-  TrendingUp
+  TrendingUp,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../AuthContext/AuthContext"; // Adjust path as needed
@@ -95,10 +96,14 @@ const FlashCard = () => {
   };
 
   const getModuleColor = (title) => {
-    if (title.toLowerCase().includes("math")) return "from-orange-500 via-red-500 to-pink-600";
-    if (title.toLowerCase().includes("science")) return "from-purple-500 via-violet-500 to-indigo-600";
-    if (title.toLowerCase().includes("web")) return "from-green-500 via-teal-500 to-cyan-600";
-    if (title.toLowerCase().includes("general")) return "from-blue-500 via-purple-500 to-indigo-600";
+    if (title.toLowerCase().includes("math"))
+      return "from-orange-500 via-red-500 to-pink-600";
+    if (title.toLowerCase().includes("science"))
+      return "from-purple-500 via-violet-500 to-indigo-600";
+    if (title.toLowerCase().includes("web"))
+      return "from-green-500 via-teal-500 to-cyan-600";
+    if (title.toLowerCase().includes("general"))
+      return "from-blue-500 via-purple-500 to-indigo-600";
     return "from-blue-400 via-cyan-400 to-teal-600";
   };
 
@@ -122,13 +127,31 @@ const FlashCard = () => {
 
   const handleFlip = () => setFlipped(!flipped);
 
+  // Normalize text function for better comparison
+  const normalizeText = (text) => {
+    return text
+      .toLowerCase()
+      .replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "")
+      .replace(/\s{2,}/g, " ")
+      .trim();
+  };
+
   const handleSubmit = () => {
     if (!flashcards[currentIndex]) return;
 
-    const isCorrect = userAnswer.trim().toLowerCase() === flashcards[currentIndex].back.trim().toLowerCase();
+    const correctAnswer = normalizeText(flashcards[currentIndex].back);
+    const userAns = normalizeText(userAnswer);
+
+    const similarity = stringSimilarity.compareTwoStrings(userAns, correctAnswer);
+    const THRESHOLD = 0.7; // Accept answers with 70%+ similarity
+
+    const isCorrect = similarity >= THRESHOLD;
     setAnswerFeedback(isCorrect);
 
-    setAttempts(prev => [...prev, { front: flashcards[currentIndex].front, userAnswer }]);
+    setAttempts((prev) => [
+      ...prev,
+      { front: flashcards[currentIndex].front, userAnswer },
+    ]);
 
     if (isCorrect) {
       const points = 5;
@@ -136,13 +159,13 @@ const FlashCard = () => {
       setStreak((prev) => prev + 1);
       setCorrectAnswers((prev) => prev + 1);
       setAnimateXP(true);
-      
+
       // Trigger confetti for streak milestones
       if ((streak + 1) % 5 === 0) {
         setConfettiActive(true);
         setTimeout(() => setConfettiActive(false), 3000);
       }
-      
+
       setTimeout(() => setAnimateXP(false), 600);
     } else {
       setStreak(0);
@@ -181,8 +204,12 @@ const FlashCard = () => {
             gameProgress: {
               ...user.gameProgress,
               flashcards: {
-                totalPlayed: (user.gameProgress.flashcards?.totalPlayed || 0) + (data.totalQuestions || 0),
-                totalCorrect: (user.gameProgress.flashcards?.totalCorrect || 0) + (data.correctAnswers || 0),
+                totalPlayed:
+                  (user.gameProgress.flashcards?.totalPlayed || 0) +
+                  (data.totalQuestions || 0),
+                totalCorrect:
+                  (user.gameProgress.flashcards?.totalCorrect || 0) +
+                  (data.correctAnswers || 0),
               },
             },
           });
