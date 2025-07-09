@@ -45,6 +45,7 @@ function App() {
           <Route path="/modules" element={<ModuleSection />} />
           <Route path="/lesson/:moduleId" element={<Lesson />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
+          
         </Route>
 
         {/* Admin layout without header/footer */}
