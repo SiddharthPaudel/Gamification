@@ -192,9 +192,9 @@ const Leaderboard = () => {
             </div>
           </div>
           <h1 className="text-8xl font-black bg-gradient-to-r from-yellow-400 via-pink-500 to-purple-500 bg-clip-text text-transparent mb-6 animate-pulse tracking-tight">
-            🏆 HALL OF FAME 🏆
+            🏆 LEADERBOARD 🏆
           </h1>
-          <p className="text-3xl text-gray-300 font-bold mb-6 animate-fade-in">Where Learning Legends Are Born! 🚀✨</p>
+          {/* <p className="text-3xl text-gray-300 font-bold mb-6 animate-fade-in">Where Learning Legends Are Born! 🚀✨</p> */}
           <div className="flex justify-center items-center gap-8 text-lg text-gray-300 bg-gray-800/30 backdrop-blur-sm rounded-2xl p-4 inline-flex border border-gray-700/50">
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-blue-400" />
@@ -317,11 +317,11 @@ const Leaderboard = () => {
                   onClick={() => toggleExpanded(user._id)}
                 >
                   {/* Rank badge enhancement for top 3 */}
-                  {rank <= 3 && (
+                  {/* {rank <= 3 && (
                     <div className="absolute -top-2 -right-2 w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center text-white font-bold text-xs shadow-lg animate-pulse">
                       TOP {rank}
                     </div>
-                  )}
+                  )} */}
                   
                   <div className="flex items-center space-x-6">
                     <div className={`${rankDisplay.bg} ${rankDisplay.glow} ${rankDisplay.border} w-16 h-16 rounded-2xl flex items-center justify-center shadow-2xl transform group-hover:scale-110 transition-all duration-300`}>
@@ -343,23 +343,25 @@ const Leaderboard = () => {
                             {user.xp.toLocaleString()}
                           </span>
                           <span className="text-sm text-gray-400">XP</span>
+                          
                         </div>
                       </div>
 
                       <div className="mb-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="text-sm font-bold text-gray-300">Progress to Level {user.level + 1}</span>
-                          <span className="text-sm text-purple-400 font-bold">{Math.round(xpProgress)}%</span>
-                        </div>
-                        <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner">
-                          <div 
-                            className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-3 rounded-full transition-all duration-1000 relative overflow-hidden" 
-                            style={{ width: `${xpProgress}%` }}
-                          >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 animate-shimmer"></div>
-                          </div>
-                        </div>
-                      </div>
+  <div className="flex items-center justify-between mb-2">
+    <span className="text-sm font-bold text-gray-300">Progress to Level {user.level + 1}</span>
+    <span className="text-sm text-purple-400 font-bold">{Math.round(xpProgress)}%</span>
+  </div>
+  <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden shadow-inner">
+    <div 
+      className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-3 rounded-full transition-all duration-1000 relative overflow-hidden" 
+      style={{ width: `${xpProgress}%` }}
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent transform -skew-x-12 animate-shimmer"></div>
+    </div>
+  </div>
+</div>
+
 
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-6 text-sm">

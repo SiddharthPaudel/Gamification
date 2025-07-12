@@ -117,7 +117,7 @@ const Header = () => {
                     User Progress
                   </Link>
                   <Link
-                    to="/profile"
+                    to="/updateprofile"
                     className="block px-4 py-2 text-sm text-indigo-600 hover:bg-indigo-50"
                     onClick={() => setProfileOpen(false)}
                   >
@@ -161,7 +161,7 @@ const Header = () => {
           <Link to="/leaderboard" className="block py-2">Leaderboard</Link>
           {user ? (
             <>
-              <Link to="/profile" className="block py-2 text-indigo-600 font-medium">Update Profile</Link>
+              <Link to="/updateprofile" className="block py-2 text-indigo-600 font-medium">Update Profile</Link>
               <button
                 onClick={handleLogout}
                 className="block py-2 w-full text-left text-red-600"

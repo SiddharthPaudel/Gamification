@@ -197,22 +197,22 @@ const FlashCard = () => {
           const data = response.data;
 
           updateUserProfile({
-            ...user,
-            xp: (user.xp || 0) + (data.xpEarned || 0),
-            level: data.newLevel ?? user.level,
-            badges: data.badges ?? user.badges,
-            gameProgress: {
-              ...user.gameProgress,
-              flashcards: {
-                totalPlayed:
-                  (user.gameProgress.flashcards?.totalPlayed || 0) +
-                  (data.totalQuestions || 0),
-                totalCorrect:
-                  (user.gameProgress.flashcards?.totalCorrect || 0) +
-                  (data.correctAnswers || 0),
-              },
-            },
-          });
+  ...user,
+  xp: (user.xp || 0) + (data.xpEarned || 0),
+  level: data.newLevel ?? user.level,
+  badges: data.badges ?? user.badges,
+  gameProgress: {
+    ...user.gameProgress,
+    flashcards: {
+      totalPlayed:
+        (user.gameProgress.flashcards?.totalPlayed || 0) +
+        (data.totalQuestions || 0),
+      totalCorrect:
+        (user.gameProgress.flashcards?.totalCorrect || 0) +
+        (data.correctAnswers || 0),
+    },
+  },
+});
 
           toast.success("XP and badges updated!");
           setAttemptSent(true);
@@ -277,10 +277,37 @@ const FlashCard = () => {
     }
   };
 
-  const handleModuleSelect = (mod) => {
+ const handleModuleSelect = async (mod) => {
+  try {
+    const res = await axios.get("http://localhost:5000/api/flashcards/all");
+    const sets = res.data;
+
+    const groupedModules = {};
+    sets.forEach((set) => {
+      const moduleTitle = set.module?.title || "Untitled";
+
+      if (!groupedModules[moduleTitle]) {
+        groupedModules[moduleTitle] = {
+          icon: getModuleIcon(moduleTitle),
+          color: getModuleColor(moduleTitle),
+          cards: [],
+          setId: set._id,
+          description: getModuleDescription(moduleTitle),
+          difficulty: getModuleDifficulty(moduleTitle),
+        };
+      }
+
+      groupedModules[moduleTitle].cards.push(...set.cards);
+    });
+
+    setModules(groupedModules);
     setSelectedModule(mod);
     setSessionStartTime(Date.now());
-  };
+  } catch (err) {
+    console.error("Failed to refresh flashcards before starting", err);
+  }
+};
+
 
   useEffect(() => {
     document.addEventListener('keypress', handleKeyPress);
