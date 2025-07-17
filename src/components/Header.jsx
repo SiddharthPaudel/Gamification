@@ -30,26 +30,50 @@ const Header = () => {
     logout();
     navigate("/");
   };
-
+  console.log(user);
   return (
     <header className="bg-white shadow-md sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center relative">
-        <Link to="/" className="flex items-center gap-2 text-indigo-600 font-bold text-xl">
+        <Link
+          to="/"
+          className="flex items-center gap-2 text-indigo-600 font-bold text-xl"
+        >
           <Medal className="w-6 h-6" />
           GamifyZone
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6 text-gray-700 font-medium">
-          <Link to="/" className="hover:text-indigo-600 transition">Home</Link>
-          <Link to="/modules" className="hover:text-indigo-600 transition">Modules</Link>
-          <Link to="/games/Word" className="hover:text-indigo-600 transition">Find Words</Link>
-          <Link to="/games/quiz" className="hover:text-indigo-600 transition">Quiz</Link>
-          <Link to="/games/flashcard" className="hover:text-indigo-600 transition">Flashcard</Link>
-          <Link to="/leaderboard" className="hover:text-indigo-600 transition">Leaderboard</Link>
+          <Link to="/" className="hover:text-indigo-600 transition">
+            Home
+          </Link>
+          <Link to="/modules" className="hover:text-indigo-600 transition">
+            Modules
+          </Link>
+          <Link to="/games/Word" className="hover:text-indigo-600 transition">
+            Find Words
+          </Link>
+          <Link to="/games/quiz" className="hover:text-indigo-600 transition">
+            Quiz
+          </Link>
+          <Link
+            to="/games/flashcard"
+            className="hover:text-indigo-600 transition"
+          >
+            Flashcard
+          </Link>
+          <Link to="/leaderboard" className="hover:text-indigo-600 transition">
+            Leaderboard
+          </Link>
+           <Link to="/shop" className="hover:text-indigo-600 transition">
+           Shop
+          </Link>
         </nav>
 
         {/* Profile Section */}
-        <div className="hidden md:flex items-center gap-4 relative" ref={profileRef}>
+        <div
+          className="hidden md:flex items-center gap-4 relative"
+          ref={profileRef}
+        >
           {user ? (
             <>
               {/* Profile with Hover Info */}
@@ -73,13 +97,22 @@ const Header = () => {
                 {/* Hover User Info Box */}
                 {hoverInfoVisible && !profileOpen && (
                   <div className="absolute top-full right-0 mt-2 w-64 bg-white border rounded-xl shadow-xl px-5 py-4 z-50 text-sm">
-                    <p className="text-base font-semibold text-gray-800 mb-2">{user.name}</p>
+                    <p className="text-base font-semibold text-gray-800 mb-2 flex items-center gap-2">
+                      {user.name}
+                      <span className="flex gap-1 text-red-500 text-sm">
+                        {Array.from({ length: user.hearts }).map((_, idx) => (
+                          <span key={idx}>❤️</span>
+                        ))}
+                      </span>
+                    </p>
 
                     {/* Level Progress */}
                     <div className="mb-3">
                       <div className="flex justify-between text-xs text-gray-500 mb-1">
                         <span>Level</span>
-                        <span>{user.level} / {maxLevel}</span>
+                        <span>
+                          {user.level} / {maxLevel}
+                        </span>
                       </div>
                       <div className="w-full h-2 bg-gray-200 rounded-full">
                         <div
@@ -93,7 +126,9 @@ const Header = () => {
                     <div>
                       <div className="flex justify-between text-xs text-gray-500 mb-1">
                         <span>XP</span>
-                        <span>{user.xp} / {maxXP}</span>
+                        <span>
+                          {user.xp} / {maxXP}
+                        </span>
                       </div>
                       <div className="w-full h-2 bg-gray-200 rounded-full">
                         <div
@@ -134,10 +169,16 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Link to="/login" className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition">
+              <Link
+                to="/login"
+                className="text-sm font-medium text-gray-700 hover:text-indigo-600 transition"
+              >
                 Login
               </Link>
-              <Link to="/signup" className="bg-indigo-600 text-white px-4 py-2 text-sm rounded-full hover:bg-indigo-700 transition">
+              <Link
+                to="/signup"
+                className="bg-indigo-600 text-white px-4 py-2 text-sm rounded-full hover:bg-indigo-700 transition"
+              >
                 Sign Up
               </Link>
             </>
@@ -153,15 +194,32 @@ const Header = () => {
       {/* Mobile Dropdown */}
       {menuOpen && (
         <div className="md:hidden bg-white px-4 pb-4 text-sm space-y-2">
-          <Link to="/" className="block py-2">Home</Link>
-          <Link to="/modules" className="block py-2">Modules</Link>
-       <Link to="/games/Word" className="block py-2">Find Words</Link>
-          <Link to="/games/quiz" className="block py-2">Quiz</Link>
-          <Link to="/games/flashcard" className="block py-2">Flashcard</Link>
-          <Link to="/leaderboard" className="block py-2">Leaderboard</Link>
+          <Link to="/" className="block py-2">
+            Home
+          </Link>
+          <Link to="/modules" className="block py-2">
+            Modules
+          </Link>
+          <Link to="/games/Word" className="block py-2">
+            Find Words
+          </Link>
+          <Link to="/games/quiz" className="block py-2">
+            Quiz
+          </Link>
+          <Link to="/games/flashcard" className="block py-2">
+            Flashcard
+          </Link>
+          <Link to="/leaderboard" className="block py-2">
+            Leaderboard
+          </Link>
           {user ? (
             <>
-              <Link to="/updateprofile" className="block py-2 text-indigo-600 font-medium">Update Profile</Link>
+              <Link
+                to="/updateprofile"
+                className="block py-2 text-indigo-600 font-medium"
+              >
+                Update Profile
+              </Link>
               <button
                 onClick={handleLogout}
                 className="block py-2 w-full text-left text-red-600"
@@ -171,8 +229,12 @@ const Header = () => {
             </>
           ) : (
             <>
-              <Link to="/login" className="block py-2">Login</Link>
-              <Link to="/signup" className="block py-2">Sign Up</Link>
+              <Link to="/login" className="block py-2">
+                Login
+              </Link>
+              <Link to="/signup" className="block py-2">
+                Sign Up
+              </Link>
             </>
           )}
         </div>

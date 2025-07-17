@@ -3,7 +3,7 @@ import { Github, Twitter, Linkedin } from 'lucide-react';
 
 const Footer = () => {
   return (
-    <footer className="bg-gray-50 border-t border-gray-200 text-gray-600 py-8 mt-12">
+    <footer className="bg-gray-50 border-t border-gray-200 text-gray-600 py-8">
       <div className="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
         <div>
           <h4 className="text-lg font-semibold mb-2 text-indigo-600">GamifyZone</h4>

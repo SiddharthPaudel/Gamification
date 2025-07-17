@@ -1,8 +1,7 @@
-
 // hooks/useQuiz.js
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import toast from 'react-hot-toast';
+import { useState, useEffect } from "react";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 export const useQuiz = (user, updateUserProfile) => {
   const [modules, setModules] = useState([]);
@@ -34,7 +33,9 @@ export const useQuiz = (user, updateUserProfile) => {
 
   const fetchModules = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/modules/get-all-module");
+      const res = await axios.get(
+        "http://localhost:5000/api/modules/get-all-module"
+      );
       const fetchedModulesRaw = res.data.modules || res.data || [];
       const fetchedModules = fetchedModulesRaw.map((m) => ({
         ...m,
@@ -51,7 +52,7 @@ export const useQuiz = (user, updateUserProfile) => {
     try {
       const res = await axios.get(`http://localhost:5000/api/quiz/${moduleId}`);
       const data = res.data;
-      
+
       let allQuestions = [];
       data.forEach((quiz) => {
         if (quiz.questions && quiz.questions.length) {
@@ -71,14 +72,19 @@ export const useQuiz = (user, updateUserProfile) => {
       return [];
     }
   };
+const handleModuleClick = async (module) => {
+  if (!user || (user.hearts ?? 0) <= 0) {
+    toast.error("You don't have enough hearts to play. Please wait or earn more!");
+    return;  // stop from starting quiz
+  }
+  
+  setActiveModule({ ...module, questions: [] });
+  resetQuizState();
+  
+  const questions = await fetchQuizzes(module.id);
+  setActiveModule(prev => ({ ...prev, questions }));
+};
 
-  const handleModuleClick = async (module) => {
-    setActiveModule({ ...module, questions: [] });
-    resetQuizState();
-    
-    const questions = await fetchQuizzes(module.id);
-    setActiveModule(prev => ({ ...prev, questions }));
-  };
 
   const handleAnswerSubmit = () => {
     if (!activeModule?.questions?.length) return;
@@ -87,14 +93,16 @@ export const useQuiz = (user, updateUserProfile) => {
     if (!currentQ || selectedAnswer === null) return;
 
     const selectedOption = currentQ.options[selectedAnswer];
-    const isCorrect = selectedOption.trim().toLowerCase() === currentQ.correctAnswer.trim().toLowerCase();
+    const isCorrect =
+      selectedOption.trim().toLowerCase() ===
+      currentQ.correctAnswer.trim().toLowerCase();
     const timeBonus = Math.floor(timeLeft / 5);
 
     if (isCorrect) {
       const nextStreak = streak + 1;
       const points = 10;
-      setScore(prev => prev + points);
-      setTotalXP(prev => prev + points);
+      setScore((prev) => prev + points);
+      setTotalXP((prev) => prev + points);
       setStreak(nextStreak);
       setAnimateScore(true);
       setTimeout(() => setAnimateScore(false), 600);
@@ -102,15 +110,18 @@ export const useQuiz = (user, updateUserProfile) => {
       setStreak(0);
     }
 
-    setAnswers(prev => [...prev, {
-      questionIndex: currentQuestion,
-      selectedAnswer,
-      selectedOption,
-      isCorrect,
-      timeLeft,
-      points: isCorrect ? 100 + timeBonus + streak * 10 : 0,
-      quizId: currentQ.quizId,
-    }]);
+    setAnswers((prev) => [
+      ...prev,
+      {
+        questionIndex: currentQuestion,
+        selectedAnswer,
+        selectedOption,
+        isCorrect,
+        timeLeft,
+        points: isCorrect ? 100 + timeBonus + streak * 10 : 0,
+        quizId: currentQ.quizId,
+      },
+    ]);
 
     setShowResult(true);
     setShowExplanation(true);
@@ -147,9 +158,12 @@ export const useQuiz = (user, updateUserProfile) => {
     try {
       const responses = await Promise.all(
         Object.entries(groupedByQuizId).map(([quizId, quizAnswers]) =>
-          axios.post(`http://localhost:5000/api/quiz/attempt/${quizId}/${user.id}`, {
-            answers: quizAnswers.map((a) => a.selectedOption),
-          })
+          axios.post(
+            `http://localhost:5000/api/quiz/attempt/${quizId}/${user.id}`,
+            {
+              answers: quizAnswers.map((a) => a.selectedOption),
+            }
+          )
         )
       );
 
@@ -160,6 +174,7 @@ export const useQuiz = (user, updateUserProfile) => {
         ...user,
         xp: data.currentXP ?? user.xp,
         level: data.newLevel ?? user.level,
+        hearts: data.heartsLeft ?? user.hearts, // <== Add this line
         badges: data.badges ?? user.badges,
         gameProgress: {
           ...user.gameProgress,
@@ -168,7 +183,9 @@ export const useQuiz = (user, updateUserProfile) => {
       };
 
       updateUserProfile(updatedUser);
-      toast.success("XP and badges updated based on quiz results!");
+      toast.success(
+        `XP, badges, and hearts updated! Hearts left: ${updatedUser.hearts}`
+      );
     } catch (error) {
       console.error("Failed to update quiz attempt:", error);
       toast.error("Failed to update XP and badges.");

@@ -40,8 +40,8 @@ const FlashCard = () => {
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [sessionStartTime, setSessionStartTime] = useState(null);
   const [confettiActive, setConfettiActive] = useState(false);
-
   const { user, updateUserProfile } = useAuth();
+  // const [hearts, setHearts] = useState(user.hearts || 5); 
 
   // Timer effect
   useEffect(() => {

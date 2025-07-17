@@ -26,6 +26,7 @@ import AddDailyWordFinder from "./Admin/AddWordFInder/AddDailyWordFInder.jsx";
 import QuizTable from "./Admin/QuizTable/QuizTable.jsx";
 import FlashCardTable from "./Admin/FlashCardTable/FlashCardTable.jsx";
 import UpdateProfile from "./Profile/UpdateProfile.jsx";
+import Shop from "./Shop/Shop.jsx";
 // Example admin page
 
 function App() {
@@ -47,6 +48,7 @@ function App() {
           <Route path="/lesson/:moduleId" element={<Lesson />} />
           <Route path="/user-dashboard" element={<UserDashboard />} />
           <Route path="/updateprofile" element={<UpdateProfile />} />
+          <Route path="/shop" element={<Shop />} />
           
         </Route>
 
