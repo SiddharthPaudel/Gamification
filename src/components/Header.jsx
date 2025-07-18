@@ -1,8 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Medal, Menu, X, ChevronDown } from "lucide-react";
+import { Medal, Menu, X, ChevronDown,Trophy, Zap } from "lucide-react";
 import { useAuth } from "../AuthContext/AuthContext";
 import boy from "../icon/boy.png";
+import levelIcon from '../icon/level-icon.png'; // Adjust path to your icon folder
+import xpIcon from '../icon/xp-icon.png'; 
+import admire from '../icon/admire.png'; 
 
 const Header = () => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -107,36 +110,42 @@ const Header = () => {
                     </p>
 
                     {/* Level Progress */}
-                    <div className="mb-3">
-                      <div className="flex justify-between text-xs text-gray-500 mb-1">
-                        <span>Level</span>
-                        <span>
-                          {user.level} / {maxLevel}
-                        </span>
-                      </div>
-                      <div className="w-full h-2 bg-gray-200 rounded-full">
-                        <div
-                          className="h-2 bg-indigo-500 rounded-full transition-all duration-300"
-                          style={{ width: `${(user.level / maxLevel) * 100}%` }}
-                        />
-                      </div>
-                    </div>
+   <div className="mb-3">
+  <div className="flex justify-between text-xs text-gray-500 mb-1">
+    <span className="flex items-center gap-1">
+      <img src={admire} alt="Level" className="w-6 h-6" />
+      Level
+    </span>
+    <span>
+      {user.level} / {maxLevel}
+    </span>
+  </div>
+  <div className="w-full h-2 bg-gray-200 rounded-full">
+    <div
+      className="h-2 bg-indigo-500 rounded-full transition-all duration-300"
+      style={{ width: `${(user.level / maxLevel) * 100}%` }}
+    />
+  </div>
+</div>
 
-                    {/* XP Progress */}
-                    <div>
-                      <div className="flex justify-between text-xs text-gray-500 mb-1">
-                        <span>XP</span>
-                        <span>
-                          {user.xp} / {maxXP}
-                        </span>
-                      </div>
-                      <div className="w-full h-2 bg-gray-200 rounded-full">
-                        <div
-                          className="h-2 bg-indigo-500 rounded-full transition-all duration-300"
-                          style={{ width: `${(user.xp / maxXP) * 100}%` }}
-                        />
-                      </div>
-                    </div>
+{/* XP Progress */}
+<div>
+  <div className="flex justify-between text-xs text-gray-500 mb-1">
+    <span className="flex items-center gap-1">
+      <img src={xpIcon} alt="XP" className="w-5 h-5" />
+      XP
+    </span>
+    <span>
+      {user.xp} / {maxXP}
+    </span>
+  </div>
+  <div className="w-full h-2 bg-gray-200 rounded-full">
+    <div
+      className="h-2 bg-indigo-500 rounded-full transition-all duration-300"
+      style={{ width: `${(user.xp / maxXP) * 100}%` }}
+    />
+  </div>
+</div>
                   </div>
                 )}
               </div>

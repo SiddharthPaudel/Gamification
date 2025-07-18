@@ -1,16 +1,85 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { CheckCircle, XCircle, ArrowLeft } from 'lucide-react';
 import OwlMascot from '../../OwlMascot/OwlMascot'; // Adjust path if needed
+
+const ConfettiCelebration = () => {
+  const [confetti, setConfetti] = useState([]);
+
+  useEffect(() => {
+    // Create confetti pieces similar to Duolingo style
+    const colors = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#96ceb4', '#ffeaa7', '#dda0dd', '#98d8c8', '#f7dc6f', '#ff9ff3', '#54a0ff'];
+    const shapes = ['▪', '▫', '●', '◯', '◆', '◇', '▲', '△', '★', '✦'];
+    
+    const newConfetti = Array.from({ length: 80 }, (_, i) => ({
+      id: i,
+      left: Math.random() * 100,
+      top: -10,
+      color: colors[Math.floor(Math.random() * colors.length)],
+      shape: shapes[Math.floor(Math.random() * shapes.length)],
+      size: Math.random() * 8 + 6, // Between 6px and 14px
+      rotation: Math.random() * 360,
+      animationDelay: Math.random() * 2,
+      animationDuration: Math.random() * 3 + 3, // Between 3 and 6 seconds
+      horizontalDrift: (Math.random() - 0.5) * 300, // Random horizontal movement
+    }));
+    setConfetti(newConfetti);
+  }, []);
+
+  return (
+    <>
+      <style jsx>{`
+        @keyframes confetti-fall {
+          0% {
+            transform: translateY(-100px) translateX(0px) rotate(0deg);
+            opacity: 1;
+          }
+          100% {
+            transform: translateY(100vh) translateX(var(--drift)) rotate(720deg);
+            opacity: 0;
+          }
+        }
+        
+        .confetti-piece {
+          animation: confetti-fall ease-in infinite;
+        }
+      `}</style>
+      
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {confetti.map((piece) => (
+          <div
+            key={piece.id}
+            className="absolute confetti-piece"
+            style={{
+              left: `${piece.left}%`,
+              top: `${piece.top}px`,
+              '--drift': `${piece.horizontalDrift}px`,
+              color: piece.color,
+              fontSize: `${piece.size}px`,
+              transform: `rotate(${piece.rotation}deg)`,
+              animationDelay: `${piece.animationDelay}s`,
+              animationDuration: `${piece.animationDuration}s`,
+            }}
+          >
+            {piece.shape}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+};
 
 const QuizComplete = ({ totalXP, answers, onBack, getAccuracy }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-900 via-purple-900 to-pink-800 px-6 py-12 flex flex-col items-center justify-center relative">
       
+      {/* Confetti Celebration */}
+      <ConfettiCelebration />
+      
       {/* Mascot Container */}
       <div className="w-36 h-36 drop-shadow-xl animate-bounce mb-4">
         <OwlMascot 
           isInCongrats 
-          size={120} 
+          size={100} 
           showMessage={true} 
           message="You Did It! 🎉🦉"
           position="relative"
