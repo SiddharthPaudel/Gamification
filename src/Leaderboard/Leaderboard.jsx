@@ -13,7 +13,7 @@ const Leaderboard = () => {
   useEffect(() => {
     const fetchLeaderboard = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/leaderboard/xp');
+        const res = await fetch('http://localhost:5000/api/leaderboard/level');
         const data = await res.json();
         setUsers(data);
       } catch (err) {
