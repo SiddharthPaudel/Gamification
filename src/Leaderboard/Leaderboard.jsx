@@ -3,7 +3,7 @@ import {
   Trophy, Crown, Medal, Award, Star, Zap, Target, BookOpen, Users, Activity, Calendar,
   ChevronDown, ChevronUp, Flame, TrendingUp, Heart, Gem
 } from 'lucide-react';
-
+import OwlMascot from '../OwlMascot/OwlMascot';
 const Leaderboard = () => {
   const [users, setUsers] = useState([]);
   const [expandedUser, setExpandedUser] = useState(null);
@@ -131,7 +131,16 @@ const Leaderboard = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 p-4">
       <div className="max-w-7xl mx-auto">
         {/* Header Section */}
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 relative">
+  {/* Floating Owl Mascot */}
+ <OwlMascot 
+  message="Leaderboard Champions!" 
+  position="absolute"
+  positionProps={{ top: 65, left: 30 }}
+  className="animate-float-mascot"
+/>
+
+
           <div className="inline-flex items-center justify-center w-24 h-24 bg-yellow-500 rounded-full shadow-lg mb-6">
             <Trophy className="w-12 h-12 text-white" />
           </div>
@@ -424,6 +433,8 @@ const Leaderboard = () => {
       `}</style>
     </div>
   );
+  
 };
+
 
 export default Leaderboard;
