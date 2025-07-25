@@ -3,7 +3,7 @@ import {
   Trophy, Crown, Medal, Award, Star, Zap, Target, BookOpen, Users, Activity, Calendar,
   ChevronDown, ChevronUp, Flame, TrendingUp, Heart, Gem
 } from 'lucide-react';
-import OwlMascot from '../OwlMascot/OwlMascot';
+import OwlMascot from '../OwlMascot/OwlMascot'
 const Leaderboard = () => {
   const [users, setUsers] = useState([]);
   const [expandedUser, setExpandedUser] = useState(null);

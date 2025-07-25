@@ -144,25 +144,33 @@ const OwlMascot = ({
   // Speech bubble positioning based on container position
   const getSpeechBubbleStyle = () => {
     const baseStyle = {
-       position: "absolute",
-  top: "-50px",
-  left: "50%",
-  transform: "translateX(-50%)",
-  width: "160px",
-  padding: "10px 14px",
-  backgroundColor: "#58cc02",
-  color: "white",
-  borderRadius: "14px",
-  fontWeight: "600",
-  fontSize: "12px",
-  fontFamily: "'Nunito', sans-serif",
-  boxShadow: "0 2px 6px rgba(0,0,0,0.3)",
-  userSelect: "none",
-  pointerEvents: "none",
-  lineHeight: 1.3,
-  textAlign: "center",
-  border: "2px solid #46a302",
-  zIndex: 10,
+    position: "absolute",
+    top: isInCongrats ? "-50px" : "-70px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    maxWidth: "220px",
+    minWidth: "120px",
+    padding: "12px 16px",
+    backgroundColor: "#fff5cc",
+    color: "#5b4d00",
+    borderRadius: "16px",
+    fontWeight: 600,
+    fontSize: "13px",
+    fontFamily: "'Nunito', sans-serif",
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.25)",
+    border: "2px solid #ffd93b",
+    textAlign: "center",
+    lineHeight: 1.4,
+    zIndex: 10,
+    userSelect: "none",
+    pointerEvents: "none",
+    transition: "all 0.3s ease",
+
+    // 🔥 Ensure text wraps horizontally
+    whiteSpace: "normal",
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    display: "inline-block",
     };
 
     // Position bubble above the owl's head
@@ -204,34 +212,35 @@ const OwlMascot = ({
       {showMessage && message && (
         <div style={getSpeechBubbleStyle()}>
           {/* Duolingo-style speech bubble arrow pointing down to the owl's head */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-12px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: 0,
-              height: 0,
-              borderLeft: "12px solid transparent",
-              borderRight: "12px solid transparent",
-              borderTop: "12px solid #58cc02",
-            }}
-          />
-          {/* Arrow border for depth */}
-          <div
-            style={{
-              position: "absolute",
-              bottom: "-15px",
-              left: "50%",
-              transform: "translateX(-50%)",
-              width: 0,
-              height: 0,
-              borderLeft: "15px solid transparent",
-              borderRight: "15px solid transparent",
-              borderTop: "15px solid #46a302",
-              zIndex: -1,
-            }}
-          />
+         <div
+  style={{
+    position: "absolute",
+    bottom: "-10px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 0,
+    height: 0,
+    borderLeft: "10px solid transparent",
+    borderRight: "10px solid transparent",
+    borderTop: "10px solid #fff5cc",
+    zIndex: 11,
+  }}
+/>
+<div
+  style={{
+    position: "absolute",
+    bottom: "-12px",
+    left: "50%",
+    transform: "translateX(-50%)",
+    width: 0,
+    height: 0,
+    borderLeft: "12px solid transparent",
+    borderRight: "12px solid transparent",
+    borderTop: "12px solid #ffd93b",
+    zIndex: 10,
+  }}
+/>
+
           {message}
         </div>
       )}

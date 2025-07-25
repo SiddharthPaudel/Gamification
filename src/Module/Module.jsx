@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ChevronRight, BookOpen, Play } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-
+import OwlMascot from '../OwlMascot/OwlMascot';
 const ModuleCard = ({ module, onGoToModule }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -127,7 +127,13 @@ export default function ModuleSection() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 py-12 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 ">
+            <OwlMascot
+  message="Explore modules and boost your knowledge!🚀"
+  position="absolute"
+  positionProps={{ top: 100, left: 30 }}
+  
+/>
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Learning Modules</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Discover our comprehensive collection of interactive learning modules designed to
@@ -151,6 +157,8 @@ export default function ModuleSection() {
           </div>
         )}
       </div>
+    
+
     </div>
   );
 }
