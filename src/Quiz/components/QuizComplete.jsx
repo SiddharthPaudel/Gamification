@@ -81,7 +81,7 @@ const QuizComplete = ({ totalXP, answers, onBack, getAccuracy }) => {
           isInCongrats 
           size={100} 
           showMessage={true} 
-          message="You Did It! 🎉🦉"
+          message="You Did It!🎉"
           position="relative"
           positionProps={{ top: 100, left: 30 }}
         />

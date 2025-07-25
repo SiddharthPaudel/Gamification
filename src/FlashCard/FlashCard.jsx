@@ -20,7 +20,10 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../AuthContext/AuthContext"; // Adjust path as needed
+import Confetti from 'react-confetti';
 import OwlMascot from '../OwlMascot/OwlMascot';
+import { useWindowSize } from '@react-hook/window-size';
+
 const FlashCard = () => {
   const [modules, setModules] = useState({});
   const [selectedModule, setSelectedModule] = useState(null);

@@ -114,22 +114,29 @@ const QuestionCard = ({
       </div>
 
       {/* 🎉 Owl Mascot Cheer */}
-      {showResult && (
-        <div className="absolute top-0 right-4 transform translate-x-1/2 z-50">
-          <OwlMascot
-            isInCongrats
-            size={75} // Decreased mascot size
-            position="relative" // Relative so it respects wrapper position
-            showMessage={true}
-             positionProps={{ top: 40, left: -10 }}
-            message={
-              isCorrect
-                ? "Woohoo! You got it right! 🎉🦉"
-                : "Oops! You'll get the next one! 💪🦉"
-            }
-          />
-        </div>
-      )}
+  {showResult && (
+  <div className="absolute top-0 right-4 z-50 flex flex-col items-end">
+    {/* Speech Bubble */}
+    <div className="relative bg-white text-gray-900 px-4 py-2 rounded-xl shadow-lg max-w-xs text-sm leading-snug mb-2">
+      <p>
+        {isCorrect
+          ? "Woohoo! You got it right! 🎉🦉"
+          : "Oops! You'll get the next one! 💪🦉"}
+      </p>
+      {/* Bubble Tail */}
+      <div className="absolute bottom-[-6px] right-4 w-3 h-3 bg-white rotate-45 shadow-md"></div>
+    </div>
+
+    {/* Owl Mascot */}
+    <OwlMascot
+      isInCongrats
+      size={85}
+      position="relative"
+      showMessage={false} // hide built-in message
+    />
+  </div>
+)}
+
     </div>
   );
 };

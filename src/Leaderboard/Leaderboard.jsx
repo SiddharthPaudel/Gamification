@@ -134,7 +134,7 @@ const Leaderboard = () => {
         <div className="text-center mb-12 relative">
   {/* Floating Owl Mascot */}
  <OwlMascot 
-  message="Leaderboard Champions!" 
+  message="Watch Your Rank!" 
   position="absolute"
   positionProps={{ top: 65, left: 30 }}
   className="animate-float-mascot"
