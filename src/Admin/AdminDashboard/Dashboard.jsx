@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Users, BookOpen, HelpCircle, FileText } from "lucide-react";
+import {
+  PieChart, Pie, Cell,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+} from "recharts";
+
+const COLORS = ["#8884d8", "#82ca9d", "#ffc658"];
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -47,6 +53,22 @@ const AdminDashboard = () => {
     },
   ];
 
+  const pieData = [
+    { name: "Modules", value: stats?.totalModules || 0 },
+    { name: "Quizzes", value: stats?.totalQuizzes || 0 },
+    { name: "Flashcards", value: stats?.totalFlashcards || 0 },
+  ];
+
+  // Mock user growth over last 6 months (replace with real API if available)
+  const lineData = [
+    { month: "Feb", users: 120 },
+    { month: "Mar", users: 170 },
+    { month: "Apr", users: 250 },
+    { month: "May", users: 320 },
+    { month: "Jun", users: 390 },
+    { month: "Jul", users: stats?.totalUsers || 400 },
+  ];
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -68,7 +90,7 @@ const AdminDashboard = () => {
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Cards */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {cards.map((card, index) => (
@@ -98,7 +120,46 @@ const AdminDashboard = () => {
           ))}
         </div>
 
+        {/* Charts Section */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-10">
+          {/* Pie Chart */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">Content Distribution</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={pieData}
+                  cx="50%"
+                  cy="50%"
+                  outerRadius={100}
+                  dataKey="value"
+                  label
+                >
+                  {pieData.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
 
+          {/* Line Chart */}
+          <div className="bg-white p-6 rounded-lg border border-gray-200">
+            <h2 className="text-lg font-semibold mb-4 text-gray-800">User Growth</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={lineData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="users" stroke="#8884d8" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
       </div>
     </div>
   );

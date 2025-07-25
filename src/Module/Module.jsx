@@ -129,9 +129,9 @@ export default function ModuleSection() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12 ">
             <OwlMascot
-  message="Explore modules and boost your knowledge!🚀"
-  position="absolute"
-  positionProps={{ top: 100, left: 30 }}
+              message="Boost your knowledge!🚀"
+               position="absolute"
+               positionProps={{ top: 100, left: 30 }}
   
 />
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Learning Modules</h1>
