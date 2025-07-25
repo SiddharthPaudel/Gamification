@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAuth } from "../AuthContext/AuthContext"; // Adjust path as needed
-
+import OwlMascot from '../OwlMascot/OwlMascot';
 const FlashCard = () => {
   const [modules, setModules] = useState({});
   const [selectedModule, setSelectedModule] = useState(null);
@@ -316,6 +316,11 @@ const FlashCard = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden">
+      <OwlMascot 
+          message="Welcome to FlashCard " 
+          position="absolute"
+          positionProps={{ top: 65, left: 30 }}
+        />
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse"></div>

@@ -52,9 +52,6 @@ const Header = () => {
           <Link to="/modules" className="hover:text-indigo-600 transition">
             Modules
           </Link>
-          <Link to="/games/Word" className="hover:text-indigo-600 transition">
-            Find Words
-          </Link>
           <Link to="/games/quiz" className="hover:text-indigo-600 transition">
             Quiz
           </Link>
@@ -64,6 +61,18 @@ const Header = () => {
           >
             Flashcard
           </Link>
+          <Link to="/games/Word" className="hover:text-indigo-600 transition">
+            Find Words
+          </Link>
+          {/* <Link to="/games/quiz" className="hover:text-indigo-600 transition">
+            Quiz
+          </Link>
+          <Link
+            to="/games/flashcard"
+            className="hover:text-indigo-600 transition"
+          >
+            Flashcard
+          </Link> */}
           <Link to="/leaderboard" className="hover:text-indigo-600 transition">
             Leaderboard
           </Link>
