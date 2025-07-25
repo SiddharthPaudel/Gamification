@@ -430,6 +430,15 @@ const Leaderboard = () => {
         .animate-float-1 { animation: float1 3s ease-in-out infinite; }
         .animate-float-2 { animation: float2 3s ease-in-out infinite 0.5s; }
         .animate-float-3 { animation: float3 3s ease-in-out infinite 1s; }
+        @keyframes floatMascot {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-12px); }
+}
+
+.animate-float-mascot {
+  animation: floatMascot 3s ease-in-out infinite;
+}
+
       `}</style>
     </div>
   );

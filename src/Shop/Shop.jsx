@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../AuthContext/AuthContext';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-
+import OwlMascot from '../OwlMascot/OwlMascot';
 const Shop = () => {
   const { user, setUser, updateUserProfile } = useAuth();
   const [heartsToBuy, setHeartsToBuy] = useState(1);
@@ -50,7 +50,12 @@ const Shop = () => {
       <div className="w-full max-w-4xl bg-white rounded-xl shadow-lg p-8">
         
         {/* Header */}
-        <div className="text-center mb-8">
+       <div className="text-center mb-8 relative">
+  <OwlMascot
+    message="Need more lives? Use your XP!"
+    position="absolute"
+    positionProps={{ top: -50, left: 30 }}
+  />
           <div className="w-16 h-16 bg-blue-600 rounded-xl flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl">🛒</span>
           </div>
@@ -193,6 +198,11 @@ const Shop = () => {
           </div>
         </div>
       </div>
+        <style jsx>{`
+
+
+
+      `}</style>
     </div>
   );
 };

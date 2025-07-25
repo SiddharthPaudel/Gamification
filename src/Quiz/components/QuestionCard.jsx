@@ -118,9 +118,10 @@ const QuestionCard = ({
         <div className="absolute top-0 right-4 transform translate-x-1/2 z-50">
           <OwlMascot
             isInCongrats
-            size={100} // Decreased mascot size
+            size={75} // Decreased mascot size
             position="relative" // Relative so it respects wrapper position
             showMessage={true}
+             positionProps={{ top: 40, left: -10 }}
             message={
               isCorrect
                 ? "Woohoo! You got it right! 🎉🦉"
