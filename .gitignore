@@ -23,4 +23,5 @@ dist-ssr
 *.sln
 *.sw?
 Game_backend/.env
+
 Game_backend/.env
