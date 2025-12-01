@@ -9,7 +9,7 @@ const Shop = () => {
   const [isLoading, setIsLoading] = useState(false);
   const XP_COST_PER_HEART = 100;
 
-  if (!user) return null;
+  if (!user) return toast.error("Login to buy");
 
   const handleBuy = async () => {
     const totalCost = heartsToBuy * XP_COST_PER_HEART;
