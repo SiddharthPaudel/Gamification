@@ -38,6 +38,9 @@ Tools: Postman, GitHub, Vite
 📸 Screenshots
 
 Home Page
+<img width="1902" height="910" alt="Screenshot 2025-07-25 162051" src="https://github.com/user-attachments/assets/e08ccbf8-9f87-4e58-b75a-1a1cbd13d6ad" />
+
+
 <img width="1899" height="903" alt="Screenshot 2025-07-25 162446" src="https://github.com/user-attachments/assets/c38ff4f0-45a8-49af-bbec-387005775410" />
 
 Module Page
